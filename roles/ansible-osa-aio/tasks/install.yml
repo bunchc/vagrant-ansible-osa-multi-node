@@ -28,6 +28,9 @@
     dest: "/etc/openstack_deploy/user_variables.yml"
     backup: yes
 
+- name: install | Add compute nodes to inventory
+  shell: echo "TODO"
+
 - name: install | Running setup-hosts.yml
   shell: openstack-ansible setup-hosts.yml
   args:
