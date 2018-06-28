@@ -1,0 +1,41 @@
+---
+# Variables for influxdb install
+
+# Defines if InflusDB is to be configured
+influxdb_config: true
+influxdb_version: 1.5.1
+
+influxdb_admin:
+  # Determines whether the admin service is enabled.
+  enabled: true
+  # The default bind address used by the admin service.
+  bind_address: "0.0.0.0"
+  # The default bind port used by the admin service.
+  bind_port: 8083
+  # The SSL certificate used when HTTPS is enabled.
+  https_certificate: /etc/ssl/influxdb.pem
+  # Whether the admin service should use HTTPS.
+  https_enabled: false
+
+influxdb_databases:
+  - host: localhost
+    name: site
+    state: present
+ # Defines the retention policy
+    retention_policy:
+      enabled: true
+      name: test-1w
+ # Define in hour(h), days(d), weeks(w) or Infinite(INF)
+      duration: 1w
+      replication: 1
+  - host: localhost
+    name: telegraf
+    state: present
+ # Defines the retention policy
+    retention_policy:
+      enabled: true
+      name: test-1w
+ # Define in hour(h), days(d), weeks(w) or Infinite(INF)
+      duration: 1w
+      replication: 1
+

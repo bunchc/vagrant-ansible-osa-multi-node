@@ -1,0 +1,12 @@
+---
+# Defines is HAProxy should be configured
+haproxy_config: true
+
+haproxy_lb_vip: "{{ vip }}"
+
+haproxy_pri_domain_name: "{{ pri_domain_name }}"
+
+haproxy_version: 1.8
+
+# Turn on remote syslog
+haproxy_enable_remote_syslog: true

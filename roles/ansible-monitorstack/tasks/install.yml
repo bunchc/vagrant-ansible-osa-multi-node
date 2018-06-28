@@ -1,0 +1,13 @@
+---
+- name: install | Cloning {{ monitorstack_git_repo }} to {{ monitorstack_source_dir }}
+  git:
+    repo: "{{ monitorstack_git_repo }}"
+    dest: "{{ monitorstack_source_dir }}"
+    version: "{{ monitorstack_git_branch }}"
+    depth: 1
+  become: true
+
+- name: install | Installing monitorstack
+  pip:
+    name: file://{{ monitorstack_source_dir }}
+  become: true

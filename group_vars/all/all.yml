@@ -1,0 +1,81 @@
+---
+# Defines if brokers should use RabbitMQ
+# This is the default. If you change this to false in preference of
+# using Redis. Then you will need to adjust the pre_processors/logstash.yml
+# logstash_outputs and processors/logstash.yml logstash_inputs
+brokers_use_rabbitmq: false
+
+# Defines if brokers should use Redis
+# This is not the default. If you change this to true in preference of
+# using RabbitMQ. Then you will need to adjust the pre_processors/logstash.yml
+# logstash_outputs and processors/logstash.yml logstash_inputs
+brokers_use_redis: true
+
+pri_domain_name: test.vagrant.local
+
+pri_interface: eth1
+
+timezone: UTC
+
+vip: 192.168.250.100
+
+# Defines info about enabling/scheduling auto updates for Netdata version
+# https://github.com/firehol/netdata/wiki/Installation#auto-update
+netdata_auto_updates:
+  enabled: false
+
+# Defines if Netdata streaming should be configured
+# https://github.com/firehol/netdata/wiki/Monitoring-ephemeral-nodes
+netdata_stream_enabled: true
+
+# Defines location of Netdata stream configuration file
+netdata_stream_config_file: '/etc/netdata/stream.conf'
+
+# Defines Netdata API Key (must be generated with command uuidgen)
+netdata_stream_api_key: '154dabe0-1d91-11e8-9f06-eb85cbb006ef'
+
+# Defines Netdata master node
+netdata_stream_master_node: 'stats-01'
+
+netdata_configure_archive: false
+
+environment:
+   HTTP_PROXY: "http://10.127.16.10:3128"
+   HTTPS_PROXY: "http://10.127.16.10:3128"
+   NO_PROXY: "localhost,127.0.0.1,10.127.*,192.168.*.*"
+   http_proxy: "http://10.127.16.10:3128"
+   https_proxy: "http://10.127.16.10:3128"
+   no_proxy: "localhost,127.0.0.1,10.127.*,192.168.*.*"
+
+telagraf_config: true
+telegraf_debian_file: "telegraf_{{ telegraf_version }}-1_amd64.deb"
+telegraf_dl_uri: https://dl.influxdata.com/telegraf/releases
+telegraf_outputs:
+  influxdb:
+    database: telegraf
+    enabled: true
+    #Defines if influxdb login is required
+    login_required: false
+    password: metricsmetricsmetricsmetrics
+    retention_policy: ""
+    timeout: 5s
+    urls:
+      - http://{{ vip }}:9096
+    username: telegraf
+    user_agent: telegraf
+    write_consistency: any
+  elasticsearch:
+    enabled: false
+  graphite:
+    enabled: false
+  graylog:
+    enabled: false
+  prometheus_client:
+    enabled: false
+
+telegraf_version: 1.5.3
+
+apt_cacher_server: "10.127.16.10"
+
+# Defines if apt-caching should be used for clients
+enable_apt_caching: true

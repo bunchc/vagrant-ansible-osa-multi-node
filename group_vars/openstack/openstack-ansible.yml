@@ -1,0 +1,135 @@
+---
+# This defines the openstack-ansible release to use.
+# The following values are known to work:
+# stable/newton
+# stable/ocata
+# stable/pike
+#release: "stable/newton"
+
+## Monitorstack config
+monitorstack_config: true
+monitorstack_openstack_services:
+  - name: DEFAULT
+    insecure: true
+    monitorstack_auth_url: "http://{{ ansible_ssh_host }}:5000/v3/"
+    monitorstack_monitorstack_user: admin
+    monitorstack_password: admin
+    monitorstack_user_domain_name: default
+    monitorstack_project_domain_name: default
+    monitorstack_project_name: admin
+
+# Set up monitorstack checks
+#telegraf_inputs:
+#  # Defines scripts to execute
+#  exec:
+#    commands:
+#      - /usr/local/bin/monitorstack -f telegraf kvm
+#    data_format: influx
+#    enabled: false
+#    timeout: 5s
+
+# Defines the release, tag, branch, or commit of openstack-ansible to deploy
+# Role has been tested with:
+# stable/newton stable/ocata stable/pike stable/queens
+osa_release: "stable/queens"
+
+# Defines the location to clone openstack-ansible to
+osa_download_location: /opt/openstack-ansible
+
+# Defines if the AIO should be configured post install
+osa_configure_aio: true
+
+# Defines if instances should be launched as part of the post install
+osa_launch_instances: true
+
+# Defines keypairs to create and upload to OSA
+osa_keypairs:
+  - name: demokey
+    #public_key_file: /root/.ssh/id_rsa.pub
+
+# Defines images to create in glance
+osa_images:
+  - name: xenial-image
+    url: "https://cloud-images.ubuntu.com/releases/16.04/release/"
+    image: "ubuntu-16.04-server-cloudimg-amd64-disk1.img"
+    container_format: bare
+    disk_format: qcow2
+#  - name: cirros-image
+#    url: "https://download.cirros-cloud.net/0.4.0/"
+#    image: "cirros-0.4.0-x86_64-disk.img"
+#    container_format: bare
+#    disk_format: qcow2
+
+# Defines neutron networks to create
+osa_networks:
+  - name: cookbook_network
+    external: false
+    shared: false
+  - name: GATEWAY_NET
+    external: true
+    shared: true
+
+# Defines list of subnets to create
+osa_subnets:
+  - name: cookbook_subnet
+    network_name: cookbook_network
+    ip_version: 4
+    cidr: 10.10.10.0/24
+    gateway_ip: 10.10.10.1
+    enable_dhcp: yes
+    dns_nameservers:
+      - 192.168.1.1
+  - name: GATEWAY_SUBNET
+    network_name: GATEWAY_NET
+    ip_version: 4
+    cidr: 192.168.100.0/24
+    enable_dhcp: yes
+    gateway_ip: 192.168.100.1
+    dns_nameservers:
+      - 192.168.100.1
+
+# Defines neutron routers to create
+osa_routers:
+  - name: cookbook_router
+    network: GATEWAY_NET
+    external_fixed_ips:
+      - subnet: GATEWAY_SUBNET
+    interfaces:
+      - cookbook_subnet
+
+# Defines security groups to create
+osa_security_groups:
+  - name: ansible
+    protocol: tcp
+    port_range_min: 22
+    port_range_max: 22
+    remote_ip_prefix: 0.0.0.0/0
+  - name: webserver
+    protocol: tcp
+    port_range_min: 80
+    port_range_max: 80
+    remote_ip_prefix: 0.0.0.0/0
+
+# Defines flavors to create
+osa_nova_flavors:
+  - name: "m1.tiny"
+    ram: 512
+    vcpus: 1
+    disk: 0
+
+# Defines instances to create
+osa_instances:
+  - name: webserver-00
+    image: xenial-image
+    key_name: demokey
+    timeout: 200
+    flavor: m1.tiny
+    network: cookbook_network
+    security_groups: default,ansible,webserver
+  - name: webserver-01
+    image: xenial-image
+    key_name: demokey
+    timeout: 200
+    flavor: m1.tiny
+    network: cookbook_network
+    security_groups: default,ansible,webserver

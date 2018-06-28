@@ -1,0 +1,16 @@
+---
+# Configure grafana
+grafana_config: true
+
+# Defines if grafana will be provisioned with datasources
+grafana_confiure_datasources: true
+grafana_url: "http://{{ inventory_hostname }}.{{ pri_domain_name }}:{{ grafana_server_info['http_port'] }}"
+
+# Defines dashboards to add to grafana
+grafana_datasources:
+  - name: "netdata-influx"
+    type: "InfluxDB"
+    access: "proxy"
+    url: "http://{{ vip }}:8086"
+    database: "telegraf"
+

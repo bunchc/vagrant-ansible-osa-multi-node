@@ -1,0 +1,61 @@
+---
+
+- name: networks | Creating networks
+  os_network:
+    name: "{{ item['name'] }}"
+    external: "{{ item['external'] }}"
+    shared: "{{ item['shared'] }}"
+    state: present
+    verify: false
+    cloud: default
+  with_items: "{{ osa_networks }}"
+  delegate_to: localhost
+
+- name: networks | Creating subnets
+  os_subnet:
+    network_name: "{{ item['network_name'] }}"
+    name: "{{ item['name'] }}"
+    ip_version: "{{ item['ip_version'] }}"
+    cidr: "{{ item['cidr'] }}"
+    gateway_ip: "{{ item['gateway_ip'] }}"
+    enable_dhcp: "{{ item['enable_dhcp'] }}"
+    dns_nameservers: "{{ item['dns_nameservers'] }}"
+    state: present
+    verify: false
+    cloud: default
+  with_items: "{{ osa_subnets }}"
+  delegate_to: localhost
+
+- name: networks | Creating routers
+  os_router:
+    name: "{{ item['name'] }}"
+    network: "{{ item['network'] }}"
+    external_fixed_ips: "{{ item['external_fixed_ips'] }}"
+    interfaces: "{{ item['interfaces'] }}"
+    verify: false
+    cloud: default
+    state: present
+  with_items: "{{ osa_routers }}"
+  delegate_to: localhost
+
+- name: networks | Creating security groups
+  os_security_group:
+    name: "{{ item['name'] }}"
+    state: present
+    verify: false
+    cloud: default
+  with_items: "{{ osa_security_groups }}"
+  delegate_to: localhost
+
+- name: networks | Add rules to security groups
+  os_security_group_rule:
+    security_group: "{{ item['name'] }}"
+    protocol: "{{ item['protocol'] }}"
+    port_range_min: "{{ item['port_range_min'] }}"
+    port_range_max: "{{ item['port_range_max'] }}"
+    remote_ip_prefix: "{{ item['remote_ip_prefix'] }}"
+    verify: false
+    cloud: default
+  with_items: "{{ osa_security_groups }}"
+  delegate_to: localhost
+

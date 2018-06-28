@@ -1,0 +1,30 @@
+{{ ansible_managed|comment }}
+
+{% for item in monitorstack_openstack_services %}
+[{{ item['name'] }}]
+{%   if item['insecure'] is defined %}
+insecure = {{ item['insecure'] }}
+{%   endif %}
+{%   if item['monitorstack_auth_url'] is defined %}
+auth_url = {{ item['monitorstack_auth_url'] }}
+{%   endif %}
+{%   if item['monitorstack_monitorstack_user'] is defined %}
+username = {{ item['monitorstack_monitorstack_user'] }}
+{% endif %}
+{%   if item['monitorstack_password'] is defined %}
+password = {{ item['monitorstack_password'] }}
+{%   endif %}
+{%   if item['monitorstack_user_domain_name'] is defined %}
+user_domain_name = {{ item['monitorstack_user_domain_name'] }}
+{%   endif %}
+{%   if item['monitorstack_project_domain_name'] is defined %}
+project_domain_name = {{ item['monitorstack_project_domain_name'] }}
+{%   endif %}
+{%   if item['monitorstack_tenant_name'] is defined %}
+tenant_name = {{ item['monitorstack_tenant_name'] }}
+{%   endif %}
+{%   if item['monitorstack_project_name'] is defined %}
+project_name = {{ item['monitorstack_project_name'] }}
+{%   endif %}
+
+{% endfor %}

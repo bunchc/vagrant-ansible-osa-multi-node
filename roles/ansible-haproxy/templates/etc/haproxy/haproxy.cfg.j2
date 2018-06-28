@@ -1,0 +1,47 @@
+# {{ ansible_managed }}
+
+global
+{% if (haproxy_enable_remote_syslog is defined and not haproxy_enable_remote_syslog) or haproxy_enable_remote_syslog is not defined %}
+    log /dev/log local0
+    log /dev/log local1 notice
+{% endif %}
+{% if (haproxy_enable_remote_syslog is defined and haproxy_enable_remote_syslog) and haproxy_syslog_servers is defined %}
+    # Remote syslog servers
+{%   for item in haproxy_syslog_servers %}
+    log {{ item['name'] }}:{{ item['port'] }} local0
+{%   endfor %}
+    #log-send-hostname
+{% endif %}
+    daemon
+{% for item in haproxy_global %}
+    {{ item }}
+{% endfor %}
+    # Default SSL material locations
+    ca-base /etc/ssl/certs
+    crt-base /etc/ssl/private
+
+    # Default ciphers to use on SSL-enabled listening sockets.
+    # For more information, see ciphers(1SSL).
+    ssl-default-bind-ciphers kEECDH+aRSA+AES:kRSA+AES:+AES256:RC4-SHA:!kEDH:!LOW:!EXP:!MD5:!aNULL:!eNULL
+    ssl-default-bind-options no-sslv3
+
+defaults
+{% for item in haproxy_defaults %}
+    {{ item }}
+{% endfor %}
+
+{% if haproxy_enable_admin_page %}
+userlist STATSUSERS
+    group admin users admin
+    user {{ haproxy_admin_user }} insecure-password {{ haproxy_admin_password }}
+
+listen stats
+    bind *:{{ haproxy_admin_port }}
+    mode http
+    stats enable
+    stats refresh 60s
+    stats uri /
+    acl AuthOkay_ReadOnly http_auth(STATSUSERS)
+    acl AuthOkay_Admin http_auth_group(STATSUSERS) admin
+    stats http-request auth realm stats unless AuthOkay_ReadOnly
+{% endif %}

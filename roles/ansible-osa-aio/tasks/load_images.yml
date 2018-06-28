@@ -1,0 +1,20 @@
+---
+
+- name: images | Download images
+  get_url:
+    url: "{{ item['url'] }}/{{ item['image'] }}"
+    dest: "/tmp/{{ item['image'] }}"
+  with_items: "{{ osa_images }}"
+  delegate_to: localhost
+
+- name: images | Creating glance images
+  os_image:
+    name: "{{ item['name'] }}"
+    container_format: "{{ item['container_format'] }}"
+    disk_format: "{{ item['disk_format'] }}"
+    cloud: default
+    state: present
+    filename: "/tmp/{{ item['image'] }}"
+    verify: false
+  with_items: "{{ osa_images }}"
+  delegate_to: localhost

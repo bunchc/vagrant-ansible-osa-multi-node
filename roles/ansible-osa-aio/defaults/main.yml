@@ -1,0 +1,90 @@
+---
+# defaults for ansible-osa-aio
+
+# Defines the release, tag, branch, or commit of openstack-ansible to deploy
+# Role has been tested with:
+# stable/newton stable/ocata stable/pike stable/queens
+osa_release: "stable/newton"
+
+# Defines the location to clone openstack-ansible to
+osa_download_location: /opt/openstack-ansible
+
+# Defines if the AIO should be configured post install
+osa_configure_aio: false
+
+# Defines if instances should be launched as part of the post install
+osa_launch_instances: false
+
+# Defines images to create in glance
+osa_images: []
+#  - name: xenial-image
+#    url: "https://cloud-images.ubuntu.com/releases/16.04/release/"
+#    image: "ubuntu-16.04-server-cloudimg-amd64-disk1.img"
+#    container_format: bare
+#    disk_format: qcow2
+#  - name: cirros-image
+#    url: "https://download.cirros-cloud.net/0.4.0/"
+#    image: "cirros-0.4.0-x86_64-disk.img"
+#    container_format: bare
+#    disk_format: qcow2
+
+# Defines neutron networks to create
+osa_networks: []
+#  - name: cookbook_network
+#    external: false
+#    shared: false
+
+# Defines list of subnets to create
+osa_subnets: []
+#  - name: cookbook_subnet
+#    network_name: cookbook_network
+#    ip_version: 4
+#    cidr: 192.168.0.0/24
+#    gateway_ip: 192.168.0.1
+#    enable_dhcp: yes
+#    dns_nameservers:
+#      - 4.2.2.2
+
+# Defines neutron routers to create
+osa_routers: []
+#  - name: cookbook_router
+#    network: NETWORK_UUID
+#    external_fixed_ips:
+#      - subnet: SUBNET_UUID
+#    interfaces:
+#      - cookbook_subnet
+
+# Defines security groups to create
+osa_security_groups: []
+#  - name: ansible
+#    rules:
+#      - name: ssh
+#        protocol: tcp
+#        port_range_min: 22
+#        port_range_max: 22
+#        remote_ip_prefix: 0.0.0.0/0
+#  - name: webserver
+#    rules:
+#      - name: http
+#        protocol: tcp
+#        port_range_min: 80
+#        port_range_max: 80
+#        remote_ip_prefix: 0.0.0.0/0
+
+# Defines instances to create
+osa_instances: []
+#  - name: webservers
+#    count: 2
+#    image: xenial-image
+#    key_name: demokey
+#    timeout: 200
+#    flavor: m1.tiny
+#    network: cookbook_network
+#    security_groups: default,ansible,webserver
+#  - name: cirros
+#    count: 1
+#    image: cirros-image
+#    timeout: 200
+#    flavor: m1.tiny
+#    network: cookbook_network
+#    security_groups: default

@@ -1,0 +1,17 @@
+---
+# Tasks for ansible-osa-aio
+
+# Download and install an openstack-ansible aio
+- include: install.yml
+
+# Download images and load them into glance
+- include: load_images.yml
+  when: osa_configure_aio
+
+# Create networks
+- include: create_networks.yml
+  when: osa_configure_aio
+
+# Launch instances
+- include: launch_instances.yml
+  when: osa_configure_aio

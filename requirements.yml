@@ -1,0 +1,19 @@
+---
+- src: https://github.com/mrlesmithjr/ansible-change-hostname
+- src: https://github.com/mrlesmithjr/ansible-dnsmasq
+- src: https://github.com/mrlesmithjr/ansible-elasticsearch
+- src: https://github.com/mrlesmithjr/ansible-elk-pre-processor
+- src: https://github.com/mrlesmithjr/ansible-elk-processor
+- src: https://github.com/mrlesmithjr/ansible-etc-hosts
+- src: https://github.com/mrlesmithjr/ansible-grafana
+- src: https://github.com/mrlesmithjr/ansible-haproxy
+- src: https://github.com/mrlesmithjr/ansible-keepalived
+- src: https://github.com/mrlesmithjr/ansible-kibana
+- src: https://github.com/mrlesmithjr/ansible-logstash
+- src: https://github.com/mrlesmithjr/ansible-ntp
+- src: https://github.com/mrlesmithjr/ansible-rabbitmq
+- src: https://github.com/mrlesmithjr/ansible-redis
+- src: https://github.com/mrlesmithjr/ansible-rsyslog
+- src: https://github.com/mrlesmithjr/ansible-timezone
+- src: https://github.com/mrlesmithjr/ansible-netdata
+- src: https://github.com/mrlesmithjr/ansible-influxdb

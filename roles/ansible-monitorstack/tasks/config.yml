@@ -1,0 +1,8 @@
+---
+# configure monitorstack
+
+- name: configure | Configuring monitorstack
+  template:
+    src: etc/openstack.ini.j2
+    dest: "{{ monitorstack_config_file }}"
+  become: true

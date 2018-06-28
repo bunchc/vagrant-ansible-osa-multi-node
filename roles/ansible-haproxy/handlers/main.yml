@@ -1,0 +1,24 @@
+---
+# handlers file for ansible-haproxy
+- name: restart haproxy
+  service:
+    name: haproxy
+    state: restarted
+  become: true
+  when: not ansible_check_mode
+
+- name: restart rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+  become: true
+  when: not ansible_check_mode
+
+# Borrowed form: https://github.com/openstack/openstack-ansible-haproxy_server
+- name: Regenerate haproxy configuration
+  assemble:
+    src: "/etc/haproxy/conf.d"
+    dest: "/etc/haproxy/haproxy.cfg"
+  notify: restart haproxy
+  tags:
+    - haproxy-general-config

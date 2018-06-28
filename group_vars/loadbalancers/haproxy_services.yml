@@ -1,0 +1,140 @@
+---
+haproxy_service_configs:
+
+# Elasticsearch
+  - service:
+      haproxy_service_name: elasticsearch-9200
+      haproxy_backend_nodes: "{{ groups['elasticsearch'] }}"
+      # haproxy_backup_nodes: "{{ groups['haproxy_all'][1:] }}"
+      haproxy_port: 9200
+      haproxy_balance_type: http
+      haproxy_balance_alg: roundrobin
+      haproxy_acls:
+        white_list:
+          rule: "src 127.0.0.1/8 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+          backend_name: "elasticsearch-9200"
+
+## InfluxDB-Relay split read-write
+  - service:
+      haproxy_service_name: influxdb
+      haproxy_backend_nodes: "{{ groups['influx'] | default([]) }}"
+      haproxy_port: 8086
+      haproxy_backend_port: 8086
+      haproxy_balance_type: http
+      haproxy_backend_options:
+        - "httpchk HEAD /ping"
+      haproxy_whitelist_networks:
+        - 192.168.0.0/16
+        - 172.16.0.0/12
+        - 10.0.0.0/8
+      haproxy_acls:
+        read_queries:
+          rule: "path_sub -i query"
+        write_queries:
+          rule: "path_sub -i write"
+          backend_name: "influxdb-relay"
+
+  - service:
+      haproxy_service_name: influxdb-relay
+      haproxy_backend_nodes: "{{ groups['influx_relay'] | default([]) }}"
+      haproxy_port: 9096
+      haproxy_backend_port: 9096
+      haproxy_balance_type: http
+      haproxy_backend_options:
+        - "httpchk HEAD /ping"
+      haproxy_whitelist_networks:
+        - 192.168.0.0/16
+        - 172.16.0.0/12
+        - 10.0.0.0/8
+      haproxy_acls:
+        write_queries:
+           rule: "path_sub -i write"
+        read_queries:
+           rule: "path_sub -i query"
+           backend_name: "influxdb"
+
+# Grafana
+  - service:
+      haproxy_service_name: grafana-3000
+      haproxy_backend_nodes: "{{ groups['dashboard'] }}"
+      # haproxy_backup_nodes: "{{ groups['haproxy_all'][1:] }}"
+      haproxy_port: 3000
+      haproxy_balance_type: http
+      haproxy_balance_alg: roundrobin
+      haproxy_acls:
+        white_list:
+          rule: "src 127.0.0.1/8 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+          backend_name: "grafana-3000"
+
+# Kibana
+  - service:
+      haproxy_service_name: kibana-5601
+      haproxy_backend_nodes: "{{ groups['dashboard'] }}"
+      # haproxy_backup_nodes: "{{ groups['haproxy_all'][1:] }}"
+      haproxy_port: 5601
+      haproxy_balance_type: http
+      haproxy_balance_alg: roundrobin
+      haproxy_acls:
+        white_list:
+          rule: "src 127.0.0.1/8 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+          backend_name: "kibana-5601"
+
+# RabbitMQ
+  - service:
+      haproxy_service_name: rabbitmq-5672
+      haproxy_backend_nodes: "{{ groups['brokers'] }}"
+      # haproxy_backup_nodes: "{{ groups['haproxy_all'][1:] }}"
+      haproxy_port: 5672
+      haproxy_balance_type: tcp
+      haproxy_balance_alg: roundrobin
+      haproxy_acls:
+        white_list:
+          rule: "src 127.0.0.1/8 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+          backend_name: "rabbitmq-5672"
+  - service:
+      haproxy_service_name: rabbitmq-15672
+      haproxy_backend_nodes: "{{ groups['brokers'] }}"
+      # haproxy_backup_nodes: "{{ groups['haproxy_all'][1:] }}"
+      haproxy_port: 15672
+      haproxy_balance_type: tcp
+      haproxy_balance_alg: roundrobin
+      haproxy_acls:
+        white_list:
+          rule: "src 127.0.0.1/8 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+          backend_name: "rabbitmq-15672"
+
+# redis
+  - service:
+      haproxy_service_name: redis-6379
+      haproxy_backend_nodes: "{{ groups['brokers'] }}"
+      # haproxy_backup_nodes: "{{ groups['haproxy_all'][1:] }}"
+      haproxy_port: 6379
+      haproxy_balance_type: tcp
+      haproxy_balance_alg: roundrobin
+      haproxy_backend_options:
+        - "tcp-check"
+      haproxy_backend_tcpcheck_options:
+        # - connect
+        - send PING\r\n
+        - expect string +PONG
+        - send info\ replication\r\n
+        - expect string role:master
+        - send QUIT\r\n
+        - expect string +OK
+      haproxy_acls:
+        white_list:
+          rule: "src 127.0.0.1/8 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+          backend_name: "redis-6379"
+
+# syslog
+  - service:
+      haproxy_service_name: syslog-10514
+      haproxy_backend_nodes: "{{ groups['pre_processors'] }}"
+      # haproxy_backup_nodes: "{{ groups['haproxy_all'][1:] }}"
+      haproxy_port: 10514
+      haproxy_balance_type: tcp
+      haproxy_balance_alg: roundrobin
+      haproxy_acls:
+        white_list:
+          rule: "src 127.0.0.1/8 192.168.0.0/16 172.16.0.0/12 10.0.0.0/8"
+          backend_name: "syslog-10514"

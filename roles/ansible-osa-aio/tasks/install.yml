@@ -1,0 +1,58 @@
+---
+# Downloads and installs an openstack-ansible aio
+
+- name: install | Clone openstack-ansible
+  git:
+    repo: https://github.com/openstack/openstack-ansible
+    dest: "{{ osa_download_location }}"
+    version: "{{ osa_release }}"
+
+- name: install | Bootstrap Ansible
+  shell: scripts/bootstrap-ansible.sh
+  environment:
+    BOOTSTRAP_OPTS: "bootstrap_host_public_address={{ ansible_ssh_host }}"
+  args:
+    chdir: "{{ osa_download_location }}"
+
+- name: install | Bootstrap AIO
+  shell: scripts/bootstrap-aio.sh
+  environment:
+    BOOTSTRAP_OPTS: "bootstrap_host_public_address={{ ansible_ssh_host }}"
+  args:
+    chdir: "{{ osa_download_location }}"
+
+- name: install | Adding external syslog config to user_variables.yml
+  # TODO: make this able to add arbritrary additional values to user_variables.yml
+  blockinfile:
+    block: "{{ lookup('template', 'templates/users_rsyslog_config.yml.j2') }}"
+    dest: "/etc/openstack_deploy/user_variables.yml"
+    backup: yes
+
+- name: install | Running setup-hosts.yml
+  shell: openstack-ansible setup-hosts.yml
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+
+- name: install | Running setup-infrastructure.yml
+  shell: openstack-ansible setup-infrastructure.yml
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+
+- name: install | Running setup-openstack.yml
+  shell: openstack-ansible setup-openstack.yml
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+
+- name: install | Correct url in clouds.yml
+  replace:
+    regexp: 'http://172.29.236.100'
+    replace: "https://{{ ansible_ssh_host }}"
+    path: "/root/.config/openstack/clouds.yaml"
+    backup: yes
+
+- name: install | Copy cloud.yml to localhost
+  fetch:
+    src: "/root/.config/openstack/clouds.yaml"
+    dest: "/etc/openstack/"
+    flat: yes
+

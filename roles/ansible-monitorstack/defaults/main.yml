@@ -1,0 +1,46 @@
+---
+# defaults file for ansible-monitorstack
+
+# Specifies the git repo to install monitorstack from
+monitorstack_git_repo: "https://github.com/openstack/monitorstack"
+
+# Define the branch, tag, or commit to install
+monitorstack_git_branch: "master"
+
+# Define location to clone into
+monitorstack_source_dir: "/opt/monitorstack"
+
+# Define if monitorstack should be configured
+monitorstack_config: false
+monitorstack_config_file: "/etc/openstack.ini"
+# Define OpenStack connection details
+monitorstack_openstack_services:
+  # Default connection info
+  - name: DEFAULT
+    insecure: true
+    monitorstack_auth_url: "{{ openrc_os_auth_url }}"
+    monitorstack_monitorstack_user: admin
+    monitorstack_password: admin
+    # Note: NEVER Mix and match the options
+    #  monitorstack_tenant_name and monitorstack_domain_name options within the
+    #  same section. You are be required to run either V2 or V3 as it pertains
+    #  to this config. If you provide both tenant_name and .*domain_name options
+    #  at the same time the plugins will fail API version negotiation.
+
+    # When using keystone V3 you will need the .*domain_name configuration options.
+#    monitorstack_user_domain_name: default
+#    monitorstack_project_domain_name: default
+
+    # If you're using keystone V2 you will need the tenant_name and project_name options.
+#    monitorstack_tenant_name: admin
+#    monitorstack_project_name: admin
+
+ # Define service specific credentials
+#  - name: ironic
+#    insecure: true
+#    monitorstack_auth_url: {{ openrc_os_auth_url }}
+#    monitorstack_monitorstack_user: ironic
+#    monitorstack_password: IronicPassword
+#    monitorstack_project_name: ironic
+#    monitorstack_user_domain_name: users
+#    monitorstack_project_domain_name: projects

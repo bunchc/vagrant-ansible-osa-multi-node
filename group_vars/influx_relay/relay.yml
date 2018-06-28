@@ -1,0 +1,26 @@
+---
+# variable file for influxdb-relay nodes
+
+influxdb_relay_binary: /usr/bin/influxdb-relay
+
+influxdb_relay_config: /etc/influxdb-relay/influxdb-relay.conf
+
+influxdb_relay_data_dir: /var/lib/influxdb-relay
+
+influxdb_relay_gopath: /opt/go
+
+influxdb_relay_log_dir: /var/log/influxdb-relay
+
+# Defines InfluxDB servers to relay to
+# Define in outputs group: if you would like to use an Ansible group...
+# otherwise define name: and location:
+influxdb_relay_servers:
+  - name: influxdb-http
+    # bind_addr: 127.0.0.1
+    bind_addr: "{{ ansible_ssh_host }}"
+    bind_port: 9096
+    outputs:
+      - group: "{{ groups['influx'] }}"
+        port: 8086
+    protocol: http
+

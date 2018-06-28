@@ -1,0 +1,17 @@
+<pool type='dir'>
+  <name>vagrant</name>
+  <capacity unit='bytes'>30102605824</capacity>
+  <allocation unit='bytes'>2482225152</allocation>
+  <available unit='bytes'>27620380672</available>
+  <source>
+  </source>
+  <target>
+    <path>/root/pools/vagrant</path>
+    <permissions>
+      <mode>0755</mode>
+      <owner>0</owner>
+      <group>0</group>
+    </permissions>
+  </target>
+</pool>
+
