@@ -1,0 +1,6 @@
+# User defined Compute Hosts, this should be a required group
+compute_hosts:
+{% for compute_host in groups['compute'] %}
+  {{ compute_host['ansible_hostname'] }}:
+    ip: "{{ compute_host['ansible_host'] }}"
+{% endfor %}

@@ -29,7 +29,10 @@
     backup: yes
 
 - name: install | Add compute nodes to inventory
-  shell: echo "TODO"
+  blockinfile:
+    block: "{{ lookup('template', 'templates/openstack_user_config.yml.j2') }}"
+    dest: "/etc/openstack_deploy/openstack_user_config.yml"
+    backup: yes
 
 - name: install | Running setup-hosts.yml
   shell: openstack-ansible setup-hosts.yml
