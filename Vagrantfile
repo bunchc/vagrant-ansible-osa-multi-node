@@ -57,17 +57,6 @@ Vagrant.configure(2) do |config|
   # Dynamic Ansible Groups iterated from nodes.yml
   ansible_groups = populated_ansible_groups
 
-  # Define Ansible groups statically for more control
-  # ansible_groups = {
-  #   "spines" => ["node0", "node7"],
-  #   "leafs" => ["node[1:2]", "node[8:9]"],
-  #   "quagga-routers:children" => ["spines", "leafs", "compute-nodes"],
-  #   "compute-nodes" => ["node[3:6]"],
-  #   "docker-swarm:children" => ["docker-swarm-managers", "docker-swarm-workers"],
-  #   "docker-swarm-managers" => ["node[3:4]"],
-  #   "docker-swarm-workers" => ["node[5:6]"]
-  # }
-
   # Iterate over nodes
   nodes.each do |node_id|
     # Below is needed if not using Guest Additions
@@ -82,7 +71,6 @@ Vagrant.configure(2) do |config|
       node.vm.hostname = node_id['name']
 
       node.vm.provider 'libvirt' do |kvm|
-        kvm.storage_pool_name = "vagrant"
         kvm.memory = node_id['mem']
         kvm.cpus = node_id['vcpu']
       end
