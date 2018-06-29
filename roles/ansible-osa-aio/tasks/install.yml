@@ -24,7 +24,7 @@
 - name: install | Adding external syslog config to user_variables.yml
   # TODO: make this able to add arbritrary additional values to user_variables.yml
   blockinfile:
-    block: "{{ lookup('template', 'templates/users_rsyslog_config.yml.j2') }}"
+    block: "{{ lookup('template', 'templates/user_rsyslog_config.yml.j2') }}"
     dest: "/etc/openstack_deploy/user_variables.yml"
     backup: yes
 
