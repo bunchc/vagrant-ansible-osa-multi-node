@@ -4,5 +4,4 @@ compute_hosts:
   {{ hostvars[compute_host]['ansible_hostname'] }}:
     ip: {{ hostvars[compute_host]['ansible_host'] }}
     ansible_user: {{ hostvars[compute_host]['ansible_user'] }}
-    ansible_pass: {{ hostvars[compute_host]['ansible_pass'] }}
 {% endfor %}
