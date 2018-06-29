@@ -175,12 +175,13 @@
       become: true
       when: ansible_os_family != "Windows"
 
+# SSH Keys are needed for the inner ansible run to work
     - name: Check that known hosts file exists
       file:
         path: "/etc/ssh_known_hosts"
         state: touch
       become: true
-    
+
     - name: Check host name availability
       shell: "ssh-keygen -f /etc/ssh_known_hosts -F {{ hostvars['item'][ansible_hostname] }}"
       with_items: groups['elkstack']
