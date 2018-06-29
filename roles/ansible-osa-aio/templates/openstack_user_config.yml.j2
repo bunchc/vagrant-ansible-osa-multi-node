@@ -2,5 +2,5 @@
 compute_hosts:
 {% for compute_host in groups['compute'] %}
   {{ hostvars[compute_host]['ansible_hostname'] }}:
-    ip: "{{ hostvars[compute_host]['ansible_host'] }}"
+    ip: {{ hostvars[compute_host]['ansible_host'] }}
 {% endfor %}
