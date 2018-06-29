@@ -17,7 +17,7 @@ nodes = YAML.load_file(File.join(File.dirname(__FILE__), 'nodes.yml'))
 #
 
 Vagrant.configure(2) do |config|
-  config.ssh.insert_key = false
+
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.scope = :machine
     config.cache.synced_folder_opts = {
