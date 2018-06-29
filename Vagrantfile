@@ -17,6 +17,7 @@ nodes = YAML.load_file(File.join(File.dirname(__FILE__), 'nodes.yml'))
 #
 
 Vagrant.configure(2) do |config|
+  config.ssh.insert_key = false
   if Vagrant.has_plugin?("vagrant-cachier")
     config.cache.scope = :machine
     config.cache.synced_folder_opts = {
@@ -53,7 +54,7 @@ Vagrant.configure(2) do |config|
       populated_ansible_groups[group] = group_nodes
     end
   end
-
+  
   # Dynamic Ansible Groups iterated from nodes.yml
   ansible_groups = populated_ansible_groups
 
