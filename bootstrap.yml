@@ -182,7 +182,7 @@
       become: true
     
     - name: Check host name availability
-      shell: "ssh-keygen -f /etc/ssh_known_hosts -F {{ item['ansible_hostname'] }}"
+      shell: "ssh-keygen -f /etc/ssh_known_hosts -F {{ hostvars['item'][ansible_hostname] }}"
       with_items: groups['elkstack']
       register: ssh_known_host_results
       ignore_errors: true
