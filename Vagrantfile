@@ -174,17 +174,21 @@ Vagrant.configure(2) do |config|
               ansible.limit = 'all'
               # Sets up host_vars
               ansible.playbook = 'prep_host_vars.yml'
+              ansible.verbose = 'vvvv'
             end
             node.vm.provision 'ansible' do |ansible|
               ansible.limit = 'all'
               # runs bootstrap Ansible playbook
               ansible.playbook = 'bootstrap.yml'
+              ansible.groups = ansible_groups
+              ansible.verbose = 'vvvv'
             end
             node.vm.provision 'ansible' do |ansible|
               ansible.limit = 'all'
               # runs Ansible playbook for installing roles/executing tasks
               ansible.playbook = 'playbook.yml'
               ansible.groups = ansible_groups
+              ansible.verbose = 'vvvv'
             end
           end
         end
