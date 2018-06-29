@@ -1,5 +1,7 @@
 rsyslog_client_user_defined_targets:
-  - name: "{{ rsyslog_servers['name'] }}"
-    proto: "{{ rsyslog_servers['proto'] }}"
-    port: "{{ rsyslog_servers['port'] }}"
+{% for rsyslog_server in rsyslog_servers %}
+  - name: "{{ rsyslog_server['name'] }}"
+    proto: "{{ rsyslog_server['proto'] }}"
+    port: "{{ rsyslog_server['port'] }}"
     hostname: "{{ vip }}"
+{% endfor %}
