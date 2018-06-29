@@ -37,16 +37,35 @@
   shell: openstack-ansible setup-hosts.yml
   args:
     chdir: "{{ osa_download_location }}/playbooks"
+  retries: 3
+  delay: 10
+  register: setup_hosts
+  until: setup_hosts.rc == 0
 
 - name: install | Running setup-infrastructure.yml
   shell: openstack-ansible setup-infrastructure.yml
   args:
     chdir: "{{ osa_download_location }}/playbooks"
+  retries: 3
+  delay: 10
+  register: setup_infra
+  until: setup_infra.rc == 0
 
 - name: install | Running setup-openstack.yml
   shell: openstack-ansible setup-openstack.yml
   args:
     chdir: "{{ osa_download_location }}/playbooks"
+  retries: 3
+  delay: 10
+  register: setup_openstack
+  until: setup_openstack.rc == 0
+
+- name: install | Set Insecure in clouds.yml
+  lineinfile:
+    line: "    verify: False"
+    path: "/root/.config/openstack/clouds.yaml"
+    insertafter: EOF
+    backup: "yes"
 
 - name: install | Correct url in clouds.yml
   replace:
@@ -60,4 +79,3 @@
     src: "/root/.config/openstack/clouds.yaml"
     dest: "/etc/openstack/"
     flat: yes
-
