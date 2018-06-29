@@ -179,6 +179,7 @@
       file:
         path: "/etc/ssh_known_hosts"
         state: touch
+      become: true
     
     - name: Check host name availability
       shell: "ssh-keygen -f /etc/ssh_known_hosts -F {{ item }}"
@@ -186,8 +187,10 @@
         - "{{ groups['elkstack'] }}"
       register: ssh_known_host_results
       ignore_errors: true
+      become: true
 
     - name: Scan public key
       shell: "ssh-keyscan -H -T 10 {{ item.item }} | tee -a /etc/ssh_known_hosts"
       with_items: ssh_known_host_results.results
       when: item.stdout == ""
+      become: true
