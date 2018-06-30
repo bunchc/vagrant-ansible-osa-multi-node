@@ -196,7 +196,7 @@
 
 # Fixup SSH on all nodes for inner ansible run
 - hosts: all
-  strategy: free
+  tasks:
     - name: Scan public key
       shell: "ssh-keyscan {{ hostvars[item]['ansible_host'] }} | tee -a /home/vagrant/.ssh/known_hosts"
       with_items: "{{ groups['openstack'] }}"
