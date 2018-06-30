@@ -183,7 +183,7 @@
       become: true
     - name: Ensure authorized_keys exists
       file:
-        path: /root/.ssh/authorized_keys
+        path: "/root/.ssh/authorized_keys"
         state: touch
       become: true
     - name: Add key to authorized_keys
@@ -219,8 +219,9 @@
       with_items: "{{ groups['openstack'] }}"
     - name: Ensure authorized_keys exists
       file:
-        path: /root/.ssh/authorized_keys
+        path: "/root/.ssh/authorized_keys"
         state: touch
+        force: true
       become: true
     - name: Add public key to authorized_keys
       shell: "cat /home/vagrant/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
