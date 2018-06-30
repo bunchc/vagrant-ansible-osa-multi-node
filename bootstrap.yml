@@ -179,7 +179,7 @@
 - hosts: openstack
   tasks:
     - name: Generate ssh key
-      shell: "sudo ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa"
+      shell: "sudo ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa"
       become: true
     - name: Add key to authorized_keys
       shell: "cat /root/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
