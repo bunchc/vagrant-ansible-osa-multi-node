@@ -198,18 +198,18 @@
 - hosts: all
   strategy: free
     - name: Scan public key
-      shell: "ssh-keyscan {{ hostvars[item]['ansible_host'] }} | tee -a $HOME/.ssh/known_hosts"
+      shell: "ssh-keyscan {{ hostvars[item]['ansible_host'] }} | tee -a /home/vagrant/.ssh/known_hosts"
       with_items: "{{ groups['openstack'] }}"
       become: true
     - name: Copy ssh private keys into /home/vagrant/.ssh
       copy:
         src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/id_rsa
-        dest: $HOME/.ssh/id_rsa
+        dest: /home/vagrant/.ssh/id_rsa
       with_items: "{{ groups['openstack'] }}"
     - name: Copy ssh public keys into /home/vagrant/.ssh
       copy:
         src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/id_rsa
-        dest: $HOME/.ssh/id_rsa.pub
+        dest: /home/vagrant/.ssh/id_rsa.pub
       with_items: "{{ groups['openstack'] }}"
     - name: Add public key to authorized_keys
-      shell: "cat $HOME/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
+      shell: "cat /home/vagrant/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
