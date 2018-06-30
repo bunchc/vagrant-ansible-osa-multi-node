@@ -201,7 +201,7 @@
       become: true
 
 # Fixup SSH on all nodes for inner ansible run
-- hosts: all
+- hosts: compute
   tasks:
     - name: Scan public key
       shell: "ssh-keyscan {{ hostvars[item]['ansible_host'] }} | tee -a /home/vagrant/.ssh/known_hosts"
