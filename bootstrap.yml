@@ -181,6 +181,11 @@
     - name: Generate ssh key
       shell: "sudo ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa"
       become: true
+    - name: Ensure authorized_keys exists
+      file:
+        path: /root/.ssh/authorized_keys
+        state: touch
+      become: true
     - name: Add key to authorized_keys
       shell: "cat /root/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
       become: true
@@ -209,9 +214,14 @@
       with_items: "{{ groups['openstack'] }}"
     - name: Copy ssh public keys into /home/vagrant/.ssh
       copy:
-        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/root/.ssh/id_rsa
+        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/root/.ssh/id_rsa.pub
         dest: /home/vagrant/.ssh/id_rsa.pub
       with_items: "{{ groups['openstack'] }}"
+    - name: Ensure authorized_keys exists
+      file:
+        path: /root/.ssh/authorized_keys
+        state: touch
+      become: true
     - name: Add public key to authorized_keys
       shell: "cat /home/vagrant/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
       become: true
