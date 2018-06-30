@@ -204,12 +204,12 @@
       become: true
     - name: Copy ssh private keys into /home/vagrant/.ssh
       copy:
-        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/id_rsa
+        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/root/.ssh/id_rsa
         dest: /home/vagrant/.ssh/id_rsa
       with_items: "{{ groups['openstack'] }}"
     - name: Copy ssh public keys into /home/vagrant/.ssh
       copy:
-        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/id_rsa
+        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/root/.ssh/id_rsa
         dest: /home/vagrant/.ssh/id_rsa.pub
       with_items: "{{ groups['openstack'] }}"
     - name: Add public key to authorized_keys
