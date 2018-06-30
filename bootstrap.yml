@@ -175,14 +175,41 @@
       become: true
       when: ansible_os_family != "Windows"
 
-# SSH Keys are needed for the inner ansible run to work
-    - name: Check that known hosts file exists
-      file:
-        path: "/etc/ssh_known_hosts"
-        state: touch
+# Generate SSH Keys for the controller
+- hosts: openstack
+  tasks:
+    - name: Generate ssh key
+      shell: "sudo ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa"
+      become: true
+    - name: Add key to authorized_keys
+      shell: "cat /root/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
+    - name: Copy ssh private key to /vagrant
+      fetch:
+        src: /root/.ssh/id_rsa
+        dest: /tmp/ssh_keys
+      become: true
+    - name: Copy ssh public key to /vagrant
+      fetch:
+        src: /root/.ssh/id_rsa.pub
+        dest: /tmp/ssh_keys
       become: true
 
+# Fixup SSH on all nodes for inner ansible run
+- hosts: all
+  strategy: free
     - name: Scan public key
-      shell: "ssh-keyscan -H -T 10 {{ hostvars[item]['ansible_host'] }} | tee -a /etc/ssh_known_hosts"
-      with_items: "{{ groups['elkstack'] }}"
+      shell: "ssh-keyscan {{ hostvars[item]['ansible_host'] }} | tee -a $HOME/.ssh/known_hosts"
+      with_items: "{{ groups['openstack'] }}"
       become: true
+    - name: Copy ssh private keys into /home/vagrant/.ssh
+      copy:
+        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/id_rsa
+        dest: $HOME/.ssh/id_rsa
+      with_items: "{{ groups['openstack'] }}"
+    - name: Copy ssh public keys into /home/vagrant/.ssh
+      copy:
+        src: /tmp/ssh_keys/{{ hostvars[item]['ansible_hostname'] }}/id_rsa
+        dest: $HOME/.ssh/id_rsa.pub
+      with_items: "{{ groups['openstack'] }}"
+    - name: Add public key to authorized_keys
+      shell: "cat $HOME/.ssh/id_rsa.pub | tee -a /root/.ssh/authorized_keys"
