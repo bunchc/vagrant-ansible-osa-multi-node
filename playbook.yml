@@ -28,7 +28,7 @@
       shell: echo "source /etc/network/interfaces.d/*.cfg" >> /etc/network/interfaces
     - name: Restart networking
       service:
-        name: networking
+        name: network
         state: restarted
       async: 45
       poll: 5
