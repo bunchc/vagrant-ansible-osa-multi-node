@@ -24,16 +24,14 @@
       file: path=/etc/network/interfaces.d state=directory mode=0755
     - name: Drop network config in place
       template: src=openstack.cfg.j2 dest=/etc/network/interfaces.d/openstack.cfg owner=root group=root mode=0644
-    - name: Ensure openstack.cfg will load
-      shell: echo "source /etc/network/interfaces.d/*.cfg" | tee /etc/network/interfaces
-  
-    - name: Restart networking
-      service:
-        name: networking
-        state: restarted
-      async: 45
-      poll: 5
-
+    - name: Copy in network script
+      copy:
+        src: network.sh
+        dest: /tmp/network.sh
+        mode: 0755
+    - name: Run network script
+      shell: bash -x /tmp/network.sh
+      become: true
 - hosts: openstack
   become: true
   become_method: sudo
