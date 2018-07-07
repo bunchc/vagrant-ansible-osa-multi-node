@@ -32,6 +32,8 @@
     - name: Run network script
       shell: bash -x /tmp/network.sh
       become: true
+      async: 45
+      poll: 5
 - hosts: openstack
   become: true
   become_method: sudo
