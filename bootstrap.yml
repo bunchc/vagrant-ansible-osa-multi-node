@@ -20,6 +20,10 @@
       - curl
       - tcpdump
       - lsof
+      - bridge-utils 
+      - debootstrap 
+      - ifenslave 
+      - ifenslave-2.6
     pri_domain_name: vagrant.local
     redhat_packages:
       - gmp-devel
