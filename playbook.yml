@@ -4,7 +4,6 @@
   become_method: sudo
   roles:
     - role: ansible-change-hostname
-    - role: ansible-apt-cacher-ng
     - role: ansible-etc-hosts
     - role: ansible-ntp
     - role: ansible-timezone
