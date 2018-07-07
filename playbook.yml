@@ -8,6 +8,31 @@
     - role: ansible-etc-hosts
     - role: ansible-ntp
     - role: ansible-timezone
+  tasks:
+    - set_fact:
+        br_mgmt_ip: "{{ item }}"
+      when: "item | ipaddr('172.29.236.0/24')"
+      with_items: "{{ ansible_all_ipv4_addresses }}"
+    - set_fact:
+        br_flat_ip: "{{ item }}"
+      when: "item | ipaddr('192.168.100.0/24')"
+      with_items: "{{ ansible_all_ipv4_addresses }}"
+    - set_fact:
+        br_vxlan_ip: "{{ item }}"
+      when: "item | ipaddr('172.29.240.0/24')"
+      with_items: "{{ ansible_all_ipv4_addresses }}"
+    - name: Ensure network config directory exists
+      file: path=/etc/network/interfaces.d state=directory mode=0755
+    - name: Drop network config in place
+      template: src=openstack.cfg.j2 dest=/etc/network/interfaces.d/openstack.cfg owner=root group=root mode=0644
+    - name: Ensure openstack.cfg will load
+      shell: echo "source /etc/network/interfaces.d/*.cfg" >> /etc/network/interfaces
+    - name: Restart networking
+      service:
+        name: networking
+        state: restarted
+      async: 45
+      poll: 5
 
 - hosts: openstack
   become: true

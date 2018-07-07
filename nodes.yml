@@ -9,7 +9,16 @@
   desktop: false
   provider: libvirt
   interfaces:
-    - ip: 192.168.250.71
+    - ip: 172.29.236.71
+      auto_config: true
+      method: static
+    - ip: 10.10.0.71
+      auto_config: true
+      method: static
+    - ip: 192.168.100.71
+      auto_config: true
+      method: static
+    - ip: 172.29.240.71
       auto_config: true
       method: static
   mem: 12288
@@ -27,7 +36,16 @@
   desktop: false
   provider: libvirt
   interfaces:
-    - ip: 192.168.250.72
+    - ip: 172.29.236.72
+      auto_config: true
+      method: static
+    - ip: 10.10.0.72
+      auto_config: true
+      method: static
+    - ip: 192.168.100.72
+      auto_config: true
+      method: static
+    - ip: 172.29.240.72
       auto_config: true
       method: static
   mem: 12288
@@ -45,7 +63,16 @@
   desktop: false
   provider: libvirt
   interfaces:
-    - ip: 192.168.250.70
+    - ip: 172.29.236.70
+      auto_config: true
+      method: static
+    - ip: 10.10.0.70
+      auto_config: true
+      method: static
+    - ip: 192.168.100.70
+      auto_config: true
+      method: static
+    - ip: 172.29.240.70
       auto_config: true
       method: static
   mem: 12288
