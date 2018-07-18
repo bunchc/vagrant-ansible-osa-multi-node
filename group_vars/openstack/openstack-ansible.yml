@@ -37,10 +37,10 @@ osa_release: "stable/queens"
 osa_download_location: /opt/openstack-ansible
 
 # Defines if the AIO should be configured post install
-osa_configure_aio: true
+osa_configure_aio: false
 
 # Defines if instances should be launched as part of the post install
-osa_launch_instances: true
+osa_launch_instances: false
 
 # Defines keypairs to create and upload to OSA
 osa_keypairs:
