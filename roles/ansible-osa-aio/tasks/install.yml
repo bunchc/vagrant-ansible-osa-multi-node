@@ -20,6 +20,7 @@
     BOOTSTRAP_OPTS: "bootstrap_host_public_address={{ ansible_ssh_host }}"
   args:
     chdir: "{{ osa_download_location }}"
+  when: run_aio
 
 - name: install | Adding external syslog config to user_variables.yml
   blockinfile:
@@ -27,7 +28,7 @@
     dest: "/etc/openstack_deploy/user_variables.yml"
     backup: yes
 
-- name: install | Add compute nodes to inventory
+- name: install | Build inventory file
   blockinfile:
     block: "{{ lookup('template', 'templates/openstack_user_config.yml.j2') }}"
     dest: "/etc/openstack_deploy/openstack_user_config.yml"

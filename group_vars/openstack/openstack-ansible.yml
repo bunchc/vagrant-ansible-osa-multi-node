@@ -18,6 +18,9 @@ monitorstack_openstack_services:
     monitorstack_project_domain_name: default
     monitorstack_project_name: admin
 
+# Build an AIO
+run_aio: false
+
 # Set up monitorstack checks
 #telegraf_inputs:
 #  # Defines scripts to execute
