@@ -22,17 +22,30 @@
     chdir: "{{ osa_download_location }}"
   when: run_aio
 
-- name: install | Adding external syslog config to user_variables.yml
-  blockinfile:
-    block: "{{ lookup('template', 'templates/user_rsyslog_config.yml.j2') }}"
-    dest: "/etc/openstack_deploy/user_variables.yml"
-    backup: yes
+- name: install | make /etc/openstack_deploy
+  file:
+    path: /etc/openstack_deploy
+    state: directory
+    mode: 0755
+  when: not run_aio
+
+- name: install | Copy in base config
+  command: cp -R {{ osa_download_location }}/etc/openstack_deploy /etc
+  when: not run_aio
 
 - name: install | Build inventory file
+  template:
+    src: templates/openstack_user_config.yml.j2
+    dest: /etc/openstack_deploy/openstack_user_config.yml
+    force: true
+    backup: true
+  when: not run_aio
+
+- name: install | Add values to user_config.yml
   blockinfile:
-    block: "{{ lookup('template', 'templates/openstack_user_config.yml.j2') }}"
-    dest: "/etc/openstack_deploy/openstack_user_config.yml"
-    backup: yes
+    block: "{{ lookup('template', 'templates/user_variables.yml.j2') }}"
+    dest: /etc/openstack_deploy/user_variables.yml
+  when: not run_aio
 
 - name: install | Running setup-hosts.yml
   shell: openstack-ansible setup-hosts.yml

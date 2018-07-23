@@ -16,8 +16,8 @@ used_ips:
 
 global_overrides:
 {% for controller in groups['openstack'] %}
-internal_lb_vip_address: {{ hostvars[controller]['br_mgmt_ip'] }}
-external_lb_vip_address: {{ hostvars[controller]['br_mgmt_ip'] }}
+  internal_lb_vip_address: {{ hostvars[controller]['br_mgmt_ip'] }}
+  external_lb_vip_address: {{ hostvars[controller]['br_mgmt_ip'] }}
 {% endfor %}
   lb_name: controller
   tunnel_bridge: "br-vxlan"

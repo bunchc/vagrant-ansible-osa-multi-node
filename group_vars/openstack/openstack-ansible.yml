@@ -19,7 +19,7 @@ monitorstack_openstack_services:
     monitorstack_project_name: admin
 
 # Build an AIO
-run_aio: false
+run_aio: true
 
 # Set up monitorstack checks
 #telegraf_inputs:
