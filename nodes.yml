@@ -1,57 +1,57 @@
 ---
-# OpenStack Ansible compute node
-# Spins up an openstack computer node
-- name: openstack-compute-01
-  ansible_groups:
-    - elkstack
-    - compute
-  box: bunchc/ubuntu-16.04-libvirt
-  desktop: false
-  provider: libvirt
-  interfaces:
-    - ip: 172.29.236.71
-      auto_config: true
-      method: static
-    - ip: 10.10.0.71
-      auto_config: true
-      method: static
-    - ip: 192.168.100.71
-      auto_config: true
-      method: static
-    - ip: 172.29.240.71
-      auto_config: true
-      method: static
-  mem: 12288
-  provision: true
-  vcpu: 4
-  windows: false
+## OpenStack Ansible compute node
+## Spins up an openstack computer node
+#- name: openstack-compute-01
+#  ansible_groups:
+#    - elkstack
+#    - compute
+#  box: bunchc/ubuntu-16.04-libvirt
+#  desktop: false
+#  provider: libvirt
+#  interfaces:
+#    - ip: 172.29.236.71
+#      auto_config: true
+#      method: static
+#    - ip: 10.10.0.71
+#      auto_config: true
+#      method: static
+#    - ip: 192.168.100.71
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.240.71
+#      auto_config: true
+#      method: static
+#  mem: 12288
+#  provision: true
+#  vcpu: 4
+#  windows: false
 
-# OpenStack Ansible compute node
-# Spins up an openstack computer node
-- name: openstack-compute-02
-  ansible_groups:
-    - elkstack
-    - compute
-  box: bunchc/ubuntu-16.04-libvirt
-  desktop: false
-  provider: libvirt
-  interfaces:
-    - ip: 172.29.236.72
-      auto_config: true
-      method: static
-    - ip: 10.10.0.72
-      auto_config: true
-      method: static
-    - ip: 192.168.100.72
-      auto_config: true
-      method: static
-    - ip: 172.29.240.72
-      auto_config: true
-      method: static
-  mem: 12288
-  provision: true
-  vcpu: 4
-  windows: false
+## OpenStack Ansible compute node
+## Spins up an openstack computer node
+#- name: openstack-compute-02
+#  ansible_groups:
+#    - elkstack
+#    - compute
+#  box: bunchc/ubuntu-16.04-libvirt
+#  desktop: false
+#  provider: libvirt
+#  interfaces:
+#    - ip: 172.29.236.72
+#      auto_config: true
+#      method: static
+#    - ip: 10.10.0.72
+#      auto_config: true
+#      method: static
+#    - ip: 192.168.100.72
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.240.72
+#      auto_config: true
+#      method: static
+#  mem: 12288
+#  provision: true
+#  vcpu: 4
+#  windows: false
 
 # OpenStack Ansible All-in-one node
 # Spins up an openstack AIO of a given release
