@@ -1,0 +1,16 @@
+---
+- name: reboot | Rebooting Server
+  reboot:
+    reboot_timeout: "{{ reboot_timeout }}"
+  when: ansible_user == "vagrant"
+
+  #- name: reboot | Vagrant style reboot
+  #  command: shutdown -h now
+  #  register: vagrant_reboot
+  #  when: ansible_user == "vagrant"
+  #
+  #- name: reboot | Wait 5 min for Vagrant reboot.yml
+  #  pause:
+  #    minutes: 5
+  #  when: ansible_user == "vagrant"
+

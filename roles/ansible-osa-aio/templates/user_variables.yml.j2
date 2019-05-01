@@ -1,2 +1,37 @@
+
+ansible_python_interpreter: "/usr/bin/python"
+
+debug: True
+
 pip_install_options: "--trusted-host {{ ansible_ssh_host }}"
+repo_nginx_threads: 2
+
+neutron_metadata_checksum_fix: True
 neutron_l2_population: true
+
+#
+# ceph-ansible settings
+#
+
+monitor_address_block: "172.29.236.0/22"
+pubic_network: "172.29.236.0/22"
+cluster_network: "172.29.244.0/22"
+osd_scenario: collocated
+journal_size: 10240
+openstack_config: true
+cinder_ceph_client: cinder
+glance_ceph_client: glance
+glance_default_store: rbd
+glance_rbd_store_pool: images
+nova_libvirt_images_rbd_pool: vms
+
+cinder_backends:
+  RBD:
+    volume_driver: cinder.volume.drivers.rbd.RBDDriver
+    rbd_pool: volumes
+    rbd_ceph_conf: /etc/ceph/ceph.conf
+    rbd_store_chunk_size: 8
+    volume_backend_name: rbddriver
+    rbd_user: "{{ '{{' }} cinder_ceph_client {{ '}}' }}"
+    rbd_secret_uuid: "{{ '{{' }} cinder_ceph_client_uuid {{ '}}' }}"
+    report_discard_supported: true

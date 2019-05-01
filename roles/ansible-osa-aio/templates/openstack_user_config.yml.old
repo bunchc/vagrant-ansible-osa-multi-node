@@ -1,8 +1,8 @@
 ---
 cidr_networks:
-  container: 172.29.236.0/22
-  tunnel: 172.29.240.0/22
-  storage: 172.29.244.0/22
+  tunnel: 172.29.240.0/24
+  storage: 172.29.244.0/24
+  container: 172.29.236.0/24
 
 used_ips:
   - 172.29.236.1
@@ -11,13 +11,12 @@ used_ips:
   - 192.168.100.1
   - 172.29.236.10
   - 192.168.100.10
-  - "172.29.236.9,172.29.236.13"
-  - "172.29.240.9,172.29.240.13"
+  - 172.29.236.9,172.29.236.13
+  - 172.29.240.9,172.29.240.13
 
 global_overrides:
 {% for controller in groups['openstack'] %}
-  internal_lb_vip_address: {{ ansible_ssh_host }}
-#  internal_lb_vip_address: {{ hostvars[controller]['br_mgmt_ip'] }}
+  internal_lb_vip_address: {{ hostvars[controller]['br_mgmt_ip'] }}
   external_lb_vip_address: {{ hostvars[controller]['br_mgmt_ip'] }}
 {% endfor %}
   lb_name: controller
@@ -34,13 +33,13 @@ global_overrides:
         container_type: "veth"
         ip_from_q: "container"
         is_container_address: true
+        is_ssh_address: true
     - network:
         group_binds:
           - neutron_linuxbridge_agent
         container_bridge: "br-vxlan"
         container_type: "veth"
         container_interface: "eth10"
-        container_mtu: "9000"
         ip_from_q: "tunnel"
         type: "vxlan"
         range: "1:1000"
@@ -52,110 +51,76 @@ global_overrides:
         container_type: "veth"
         container_interface: "eth11"
         type: "vlan"
-        range: "101:200,301:400"
+        range: "1:1"
         net_name: "vlan"
     - network:
-        group_binds:
-          - neutron_linuxbridge_agent
         container_bridge: "br-vlan"
         container_type: "veth"
         container_interface: "eth12"
         host_bind_override: "eth12"
         type: "flat"
         net_name: "flat"
-    - network:
         group_binds:
-          - glance_api
-          - cinder_api
-          - cinder_volume
-          - nova_compute
-          - ceph-osd
-        container_bridge: "br-storage"
-        container_type: "veth"
-        container_interface: "eth2"
-        ip_from_w: "storae"
-        type: "raw"
+          - neutron_linuxbridge_agent
 
+# Shared infrastructure parts
 shared-infra_hosts:
 {% for controller in groups['openstack'] %}
   {{ hostvars[controller]['ansible_hostname'] }}:
     ip: {{ hostvars[controller]['br_mgmt_ip'] }}
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
 {% endfor %}
-#
-repo-infra_hosts:
-{% for controller in groups['openstack'] %}
-  {{ hostvars[controller]['ansible_hostname'] }}:
-    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[controller]['ansible_user'] }}
-{% endfor %}
-#
+
+# OpenStack Compute infrastructure parts
 os-infra_hosts:
 {% for controller in groups['openstack'] %}
   {{ hostvars[controller]['ansible_hostname'] }}:
     ip: {{ hostvars[controller]['br_mgmt_ip'] }}
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
 {% endfor %}
-#
-identity_hosts:
-{% for controller in groups['openstack'] %}
-  {{ hostvars[controller]['ansible_hostname'] }}:
-    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[controller]['ansible_user'] }}
-{% endfor %}
-#
-haproxy_hosts:
-{% for controller in groups['openstack'] %}
-  {{ hostvars[controller]['ansible_hostname'] }}:
-    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[controller]['ansible_user'] }}
-{% endfor %}
-#
-network_hosts:
-{% for controller in groups['openstack'] %}
-  {{ hostvars[controller]['ansible_hostname'] }}:
-    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[controller]['ansible_user'] }}
-{% endfor %}
-#
-compute_hosts:
-{% for compute_host in groups['compute'] %}
-  {{ hostvars[compute_host]['ansible_hostname'] }}:
-    ip: {{ hostvars[compute_host]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[compute_host]['ansible_user'] }}
-{% endfor %}
-#
-ceph-osd_hosts:
-{% for ceph_osd in groups['ceph'] %}
-  {{ hostvars[ceph_osd]['ansible_hostname'] }}:
-    ip: {{ hostvars[ceph_osd]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[ceph_osd]['ansible_user'] }}
-{% endfor %}
-#
-ceph-mon_hosts:
-{% for controller in groups['openstack'] %}
-  {{ hostvars[controller]['ansible_hostname'] }}:
-    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[controller]['ansible_user'] }}
-{% endfor %}
-#
-log_hosts:
-{% for controller in groups['openstack'] %}
-  {{ hostvars[controller]['ansible_hostname'] }}:
-    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
-    ansible_user: {{ hostvars[controller]['ansible_user'] }}
-{% endfor %}
-#
+
+# OpenStack Storage infrastructure parts
 storage-infra_hosts:
 {% for controller in groups['openstack'] %}
   {{ hostvars[controller]['ansible_hostname'] }}:
     ip: {{ hostvars[controller]['br_mgmt_ip'] }}
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
 {% endfor %}
-#
-storage_hosts:
+
+# Keystone Identity infrastructure parts
+identity_hosts:
 {% for controller in groups['openstack'] %}
   {{ hostvars[controller]['ansible_hostname'] }}:
     ip: {{ hostvars[controller]['br_mgmt_ip'] }}
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
+{% endfor %}
+
+log_hosts:
+{% for controller in groups['openstack'] %}
+  {{ hostvars[controller]['ansible_hostname'] }}:
+    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
+    ansible_user: {{ hostvars[controller]['ansible_user'] }}
+{% endfor %}
+
+network_hosts:
+{% for controller in groups['openstack'] %}
+  {{ hostvars[controller]['ansible_hostname'] }}:
+    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
+    ansible_user: {{ hostvars[controller]['ansible_user'] }}
+{% endfor %}
+
+# User defined Repository Hosts, this is an optional group
+repo-infra_hosts:
+{% for controller in groups['openstack'] %}
+  {{ hostvars[controller]['ansible_hostname'] }}:
+    ip: {{ hostvars[controller]['br_mgmt_ip'] }}
+    ansible_user: {{ hostvars[controller]['ansible_user'] }}
+{% endfor %}
+
+# User defined Compute Hosts, this should be a required group
+compute_hosts:
+{% for compute_host in groups['compute'] %}
+  {{ hostvars[compute_host]['ansible_hostname'] }}:
+    ip: {{ hostvars[compute_host]['br_mgmt_ip'] }}
+    ansible_user: {{ hostvars[compute_host]['ansible_user'] }}
 {% endfor %}

@@ -17,14 +17,6 @@ nodes = YAML.load_file(File.join(File.dirname(__FILE__), 'nodes.yml'))
 #
 
 Vagrant.configure(2) do |config|
-
-  if Vagrant.has_plugin?("vagrant-cachier")
-    config.cache.scope = :machine
-    config.cache.synced_folder_opts = {
-      type: :nfs,
-      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
-    }
-  end
   # Iterate over nodes to get a count
   # Define as 0 for counting the number of nodes to create from nodes.yml
   groups = [] # Define array to hold ansible groups
@@ -54,14 +46,25 @@ Vagrant.configure(2) do |config|
       populated_ansible_groups[group] = group_nodes
     end
   end
-  
+
   # Dynamic Ansible Groups iterated from nodes.yml
   ansible_groups = populated_ansible_groups
+
+  # Define Ansible groups statically for more control
+  # ansible_groups = {
+  #   "spines" => ["node0", "node7"],
+  #   "leafs" => ["node[1:2]", "node[8:9]"],
+  #   "quagga-routers:children" => ["spines", "leafs", "compute-nodes"],
+  #   "compute-nodes" => ["node[3:6]"],
+  #   "docker-swarm:children" => ["docker-swarm-managers", "docker-swarm-workers"],
+  #   "docker-swarm-managers" => ["node[3:4]"],
+  #   "docker-swarm-workers" => ["node[5:6]"]
+  # }
 
   # Iterate over nodes
   nodes.each do |node_id|
     # Below is needed if not using Guest Additions
-    config.vm.synced_folder ".", "/vagrant", type: "nfs" #, rsync__exclude: "hosts"
+    #config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: "hosts"
     config.vm.define node_id['name'] do |node|
       unless node_id['synced_folder'].nil?
         unless node_id['synced_folder']['type'].nil?
@@ -72,6 +75,13 @@ Vagrant.configure(2) do |config|
       node.vm.hostname = node_id['name']
 
       node.vm.provider 'libvirt' do |kvm|
+        unless node_id['windows'].nil?
+          if node_id['windows']
+            config.vm.synced_folder ".", "/vagrant", disabled: true
+          end
+        end
+        kvm.storage_pool_name = "virtual_machines"
+        kvm.graphics_ip = "0.0.0.0"
         kvm.memory = node_id['mem']
         kvm.cpus = node_id['vcpu']
       end
@@ -119,6 +129,12 @@ Vagrant.configure(2) do |config|
                           '--type', 'hdd', '--medium', ddev.to_s]
           end
         end
+      end
+
+      # If the node has an ssh_user and ssh_password set, use those
+      unless node_id['ssh_user'].nil? && node_id['ssh_pass'].nil?
+        node.ssh.username = node_id['ssh_user']
+        node.ssh.password = node_id['ssh_pass']
       end
 
       # Provision network interfaces
@@ -174,21 +190,18 @@ Vagrant.configure(2) do |config|
               ansible.limit = 'all'
               # Sets up host_vars
               ansible.playbook = 'prep_host_vars.yml'
-              ansible.verbose = 'vvvv'
             end
             node.vm.provision 'ansible' do |ansible|
               ansible.limit = 'all'
               # runs bootstrap Ansible playbook
               ansible.playbook = 'bootstrap.yml'
               ansible.groups = ansible_groups
-              ansible.verbose = 'vvvv'
             end
             node.vm.provision 'ansible' do |ansible|
               ansible.limit = 'all'
               # runs Ansible playbook for installing roles/executing tasks
               ansible.playbook = 'playbook.yml'
               ansible.groups = ansible_groups
-              ansible.verbose = 'vvvv'
             end
           end
         end

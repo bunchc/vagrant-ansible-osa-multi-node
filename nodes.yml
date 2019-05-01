@@ -1,68 +1,168 @@
 ---
-## OpenStack Ansible compute node
-## Spins up an openstack computer node
-#- name: openstack-compute-01
-#  ansible_groups:
-#    - elkstack
-#    - compute
-#  box: bunchc/ubuntu-16.04-libvirt
-#  desktop: false
-#  provider: libvirt
-#  interfaces:
-#    - ip: 172.29.236.71
-#      auto_config: true
-#      method: static
-#    - ip: 10.10.0.71
-#      auto_config: true
-#      method: static
-#    - ip: 192.168.100.71
-#      auto_config: true
-#      method: static
-#    - ip: 172.29.240.71
-#      auto_config: true
-#      method: static
-#  mem: 12288
-#  provision: true
-#  vcpu: 4
-#  windows: false
+###########################
+# OpenStack compute nodes #
+###########################
+#
+# This section defines compute hosts for openstack.
+# To add more compute hosts duplicate a host definition and change as needed.
+#
+# Currently this supports two cells: cell1 and cell2
+# If no cell is supplied, the host will be configured in cell1.
 
-## OpenStack Ansible compute node
-## Spins up an openstack computer node
-#- name: openstack-compute-02
-#  ansible_groups:
-#    - elkstack
-#    - compute
-#  box: bunchc/ubuntu-16.04-libvirt
-#  desktop: false
-#  provider: libvirt
-#  interfaces:
-#    - ip: 172.29.236.72
-#      auto_config: true
-#      method: static
-#    - ip: 10.10.0.72
-#      auto_config: true
-#      method: static
-#    - ip: 192.168.100.72
-#      auto_config: true
-#      method: static
-#    - ip: 172.29.240.72
-#      auto_config: true
-#      method: static
-#  mem: 12288
-#  provision: true
-#  vcpu: 4
-#  windows: false
-
-# OpenStack Ansible All-in-one node
-# Spins up an openstack AIO of a given release
-- name: openstack-ansible-01
+- name: osa-comp-c1-01
   ansible_groups:
     - elkstack
-    - openstack
-  box: bunchc/ubuntu-16.04-libvirt
+    - compute
+    - cell1
+  box: bunchc/bionic64
   desktop: false
   provider: libvirt
   interfaces:
+    - ip: 192.168.200.71
+      auto_config: true
+      method: static
+    - ip: 172.29.236.71
+      auto_config: true
+      method: static
+    - ip: 10.10.0.71
+      auto_config: true
+      method: static
+    - ip: 192.168.100.71
+      auto_config: true
+      method: static
+    - ip: 172.29.240.71
+      auto_config: true
+      method: static
+    - ip: 172.29.244.71
+      auto_config: true
+      method: static
+  mem: 8192
+  provision: true
+  vcpu: 4
+  windows: false
+
+- name: osa-comp-c2-01
+  ansible_groups:
+    - elkstack
+    - compute
+    - cell2
+  box: bunchc/bionic64
+  desktop: false
+  provider: libvirt
+  interfaces:
+    - ip: 192.168.200.72
+      auto_config: true
+      method: static
+    - ip: 172.29.236.72
+      auto_config: true
+      method: static
+    - ip: 10.10.0.72
+      auto_config: true
+      method: static
+    - ip: 192.168.100.72
+      auto_config: true
+      method: static
+    - ip: 172.29.240.72
+      auto_config: true
+      method: static
+    - ip: 172.29.244.72
+      auto_config: true
+      method: static
+  mem: 8192
+  provision: true
+  vcpu: 4
+  windows: false
+
+##################
+## Ceph Cluster ##
+##################
+#
+# Builds a 3 node ceph cluster for use with cinder.
+# To provision the ceph cluster set:
+# `osa_enable_ceph: true` in group_vars/openstack/openstack.yml
+#
+# To add additional nodes, copy the below lines
+
+- name: osa-ceph-01
+  ansible_groups:
+    - elkstack
+    - ceph
+  box: bunchc/bionic64
+  desktop: false
+  provider: libvirt
+  interfaces:
+    - ip: 192.168.200.81
+      auto_config: true
+      method: static
+    - ip: 172.29.236.81
+      auto_config: true
+      method: static
+    - ip: 172.29.244.81
+      auto_config: true
+      method: static
+  mem: 4096
+  provision: true
+  vcpu: 1
+  windows: false
+
+- name: osa-ceph-02
+  ansible_groups:
+    - elkstack
+    - ceph
+  box: bunchc/bionic64
+  desktop: false
+  provider: libvirt
+  interfaces:
+    - ip: 192.168.200.82
+      auto_config: true
+      method: static
+    - ip: 172.29.236.82
+      auto_config: true
+      method: static
+    - ip: 172.29.244.82
+      auto_config: true
+      method: static
+  mem: 4096
+  provision: true
+  vcpu: 1
+  windows: false
+
+- name: osa-ceph-03
+  ansible_groups:
+    - elkstack
+    - ceph
+  box: bunchc/bionic64
+  desktop: false
+  provider: libvirt
+  interfaces:
+    - ip: 192.168.200.83
+      auto_config: true
+      method: static
+    - ip: 172.29.236.83
+      auto_config: true
+      method: static
+    - ip: 172.29.244.83
+      auto_config: true
+      method: static
+  mem: 4096
+  provision: true
+  vcpu: 1
+  windows: false
+
+# OpenStack Ansible controller
+# After the other nodes have come online, this builds the control plane
+# Copy this config to add additional controller nodes
+- name: osa-controller-01
+  ansible_groups:
+    - elkstack
+    - openstack
+  box: bunchc/bionic64
+  desktop: false
+  provider: libvirt
+  interfaces:
+    - ip: 192.168.200.70
+      auto_config: true
+      method: static
     - ip: 172.29.236.70
       auto_config: true
       method: static
@@ -75,7 +175,11 @@
     - ip: 172.29.240.70
       auto_config: true
       method: static
-  mem: 12288
+    - ip: 172.29.244.70
+      auto_config: true
+      method: static
+  mem: 16384
   provision: true
   vcpu: 4
   windows: false
+

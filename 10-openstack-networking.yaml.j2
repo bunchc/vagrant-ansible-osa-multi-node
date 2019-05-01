@@ -1,0 +1,48 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    ens5:
+      dhcp4: yes
+    {{ br_mgmt_interface }}:
+      dhcp4: no
+{% if br_vlan_interface is defined and br_vlan_interface != None %}
+    {{ br_vlan_interface }}:
+      dhcp4: no
+{% endif %}
+{% if br_flat_interface is defined and br_flat_interface != None %}
+    {{ br_flat_interface }}:
+      dhcp4: no
+{% endif %}
+{% if br_vxlan_interface is defined and br_vxlan_interface != None %}
+    {{ br_vxlan_interface }}:
+      dhcp4: no
+{% endif %}
+{% if br_storage_interface is defined and br_storage_interface != None %}
+    {{ br_storage_interface }}:
+      dhcp4: no
+{% endif %}
+  bridges:
+    br-mgmt:
+      addresses: [ {{ br_mgmt_ip }}/22 ]
+      interfaces: [ {{ br_mgmt_interface }} ]
+{% if br_vlan_interface is defined and br_vlan_interface != None %}
+    br-vlan:
+      addresses: [ ]
+      interfaces: [ {{ br_vlan_interface }} ]
+{% endif %}
+{% if br_flat_interface is defined and br_flat_ip != None %}
+    br-flat:
+      addresses: [ {{ br_flat_ip }}/22 ]
+      interfaces: [ {{ br_flat_interface }} ]
+{% endif %}
+{% if br_vxlan_interface is defined and br_vxlan_ip != None %}
+    br-vxlan:
+      addresses: [ {{ br_vxlan_ip }}/22 ]
+      interfaces: [ {{ br_vxlan_interface }} ]
+{% endif %}
+{% if br_storage_interface is defined and br_storage_ip != None %}
+    br-storage:
+      addresses: [ {{ br_storage_ip }}/22 ]
+      interfaces: [ {{ br_storage_interface }} ]
+{% endif %}

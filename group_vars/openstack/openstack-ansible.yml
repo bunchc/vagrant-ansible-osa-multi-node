@@ -19,7 +19,7 @@ monitorstack_openstack_services:
     monitorstack_project_name: admin
 
 # Build an AIO
-run_aio: true
+run_aio: false
 
 # Set up monitorstack checks
 #telegraf_inputs:
@@ -31,10 +31,11 @@ run_aio: true
 #    enabled: false
 #    timeout: 5s
 
+
 # Defines the release, tag, branch, or commit of openstack-ansible to deploy
 # Role has been tested with:
-# stable/newton stable/ocata stable/pike stable/queens
-osa_release: "stable/queens"
+# stable/queens stable/rocky stable/stein
+osa_release: "stable/rocky"
 
 # Defines the location to clone openstack-ansible to
 osa_download_location: /opt/openstack-ansible

@@ -2,42 +2,85 @@
 - hosts: elkstack
   become: true
   become_method: sudo
+  strategy: free
   roles:
     - role: ansible-change-hostname
     - role: ansible-etc-hosts
     - role: ansible-ntp
     - role: ansible-timezone
+
+- hosts: elkstack
+  become: true
+  become_method: sudo
   tasks:
     - set_fact:
         br_mgmt_ip: "{{ item }}"
-      when: "item | ipaddr('172.29.236.0/24')"
+      when: "item | ipaddr('172.29.236.0/22')"
       with_items: "{{ ansible_all_ipv4_addresses }}"
     - set_fact:
         br_flat_ip: "{{ item }}"
-      when: "item | ipaddr('192.168.100.0/24')"
+      when: "item | ipaddr('192.168.100.0/22')"
       with_items: "{{ ansible_all_ipv4_addresses }}"
     - set_fact:
         br_vxlan_ip: "{{ item }}"
-      when: "item | ipaddr('172.29.240.0/24')"
+      when: "item | ipaddr('172.29.240.0/22')"
+      with_items: "{{ ansible_all_ipv4_addresses }}"
+    - set_fact:
+        br_storage_ip: "{{ item }}"
+      when: "item | ipaddr('172.29.244.0/22')"
       with_items: "{{ ansible_all_ipv4_addresses }}"
     - name: Ensure network config directory exists
       file: path=/etc/network/interfaces.d state=directory mode=0755
-    - name: Drop network config in place
-      template: src=openstack.cfg.j2 dest=/etc/network/interfaces.d/openstack.cfg owner=root group=root mode=0644
-    - name: Copy in network script
-      copy:
-        src: network.sh
-        dest: /tmp/network.sh
-        mode: 0755
-    - name: Run network script
-      shell: bash -x /tmp/network.sh
-      become: true
-      async: 45
-      poll: 5
-    - name: Install shade
-      pip:
-        name: shade
-        state: present
+    - name: "[br-mgmt] Set network facts"
+      set_fact:
+        br_mgmt_interface: "{{ item }}"
+      when: "item | ipaddr('172.29.236.0/22')"
+      when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('172.29.236.0/22')"
+      with_items:
+        - "{{ ansible_interfaces }}"
+    - name: "[br-vlan] Set network facts"
+      set_fact:
+        br_flat_interface: "{{ item }}"
+      when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('192.168.100.0/22')"
+      with_items:
+        - "{{ ansible_interfaces }}"
+    - name: "[br-flat] Set network facts"
+      set_fact:
+        br_vlan_interface: "{{ item }}"
+      when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('10.10.0.0/22')"
+      with_items:
+        - "{{ ansible_interfaces }}"
+    - name: "[br-vxlan] Set network facts"
+      set_fact:
+        br_vxlan_interface: "{{ item }}"
+      when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('172.29.240.0/22')"
+      with_items:
+        - "{{ ansible_interfaces }}"
+    - name: "[br-storage] Set network facts"
+      set_fact:
+        br_storage_interface: "{{ item }}"
+      when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('172.29.244.0/22')"
+      with_items:
+        - "{{ ansible_interfaces }}"
+    - name: Drop openstack network config in place
+      template: src=10-openstack-networking.yaml.j2 dest=/etc/netplan/10-openstack-networking.yaml owner=root group=root mode=0644
+    - name: Nuke old networking
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "/etc/netplan/50-vagrant.yaml"
+        - "/etc/systemd/network/99-dhcp-default.network"
+    - name: Apply netplan config
+      command: "{{ item }}"
+      with_items:
+        - "netplan generate"
+        - "netplan apply"
+    - name: Restart networking
+      service:
+        name: networking
+        state: restarted
+
 - hosts: openstack
   become: true
   become_method: sudo

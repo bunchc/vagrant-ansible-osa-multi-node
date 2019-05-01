@@ -20,18 +20,24 @@
     BOOTSTRAP_OPTS: "bootstrap_host_public_address={{ ansible_ssh_host }}"
   args:
     chdir: "{{ osa_download_location }}"
-  when: run_aio
+  when: >
+        run_aio is defined and
+        run_aio
 
 - name: install | make /etc/openstack_deploy
   file:
     path: /etc/openstack_deploy
     state: directory
     mode: 0755
-  when: not run_aio
+  when: >
+          run_aio is defined and
+          not run_aio
 
 - name: install | Copy in base config
   command: cp -R {{ osa_download_location }}/etc/openstack_deploy /etc
-  when: not run_aio
+  when: >
+          run_aio is defined and
+          not run_aio
 
 - name: install | Build inventory file
   template:
@@ -39,14 +45,66 @@
     dest: /etc/openstack_deploy/openstack_user_config.yml
     force: true
     backup: true
-  when: not run_aio
+  when: >
+          run_aio is defined and
+          not run_aio
 
 - name: install | Add values to user_config.yml
   blockinfile:
     block: "{{ lookup('template', 'templates/user_variables.yml.j2') }}"
     dest: /etc/openstack_deploy/user_variables.yml
-  when: not run_aio
+  when: >
+          run_aio is defined and 
+          not run_aio
 
+- name: install | Get pip and pw-gen deps
+  shell: |
+    python2 /opt/get-pip.py
+    $(which pip2 || which pip) install setuptools pycrypto pyyaml
+  args:
+    chdir: /opt/openstack-ansible
+
+- name: install | Generate passwords
+  command: python2 ./scripts/pw-token-gen.py --file /etc/openstack_deploy/user_secrets.yml
+  args:
+    chdir: /opt/openstack-ansible
+
+- name: install | Fact gathering
+  shell: ansible -m setup -a 'gather_subset=network,hardware,virtual' hosts
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+
+- name: install | Running setup-hosts.yml
+  shell: openstack-ansible setup-hosts.yml -e osa_gather_facts=False
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+  retries: 0
+  delay: 10
+  register: setup_hosts
+  until: setup_hosts.rc == 0
+
+- name: install | Fact gathering
+  shell: ansible -m setup -a 'gather_subset=network,hardware,virtual' hosts
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+
+- name: install | Running setup-infrastructure.yml
+  shell: openstack-ansible setup-infrastructure.yml -e osa_gather_facts=False
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+  retries: 0
+  delay: 10
+  register: setup_infra
+  until: setup_infra.rc == 0
+
+- name: install | Running setup-openstack.yml
+  shell: openstack-ansible setup-openstack.yml -e osa_gather_facts=False
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+  retries: 0
+  delay: 10
+  register: setup_openstack
+  until: setup_openstack.rc == 0
 - name: install | Running setup-hosts.yml
   shell: openstack-ansible setup-hosts.yml
   args:
@@ -55,24 +113,6 @@
   delay: 10
   register: setup_hosts
   until: setup_hosts.rc == 0
-
-- name: install | Running setup-infrastructure.yml
-  shell: openstack-ansible setup-infrastructure.yml
-  args:
-    chdir: "{{ osa_download_location }}/playbooks"
-  retries: 3
-  delay: 10
-  register: setup_infra
-  until: setup_infra.rc == 0
-
-- name: install | Running setup-openstack.yml
-  shell: openstack-ansible setup-openstack.yml
-  args:
-    chdir: "{{ osa_download_location }}/playbooks"
-  retries: 3
-  delay: 10
-  register: setup_openstack
-  until: setup_openstack.rc == 0
 
 - name: install | Set Insecure in clouds.yml
   lineinfile:

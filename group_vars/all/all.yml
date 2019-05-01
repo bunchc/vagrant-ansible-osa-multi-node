@@ -11,13 +11,15 @@ brokers_use_rabbitmq: false
 # logstash_outputs and processors/logstash.yml logstash_inputs
 brokers_use_redis: true
 
+reboot_timeout: "300"
+
 pri_domain_name: test.vagrant.local
 
 pri_interface: eth1
 
 timezone: UTC
 
-vip: 192.168.250.100
+vip: 192.168.250.70
 
 # Defines info about enabling/scheduling auto updates for Netdata version
 # https://github.com/firehol/netdata/wiki/Installation#auto-update
