@@ -15,6 +15,9 @@ osa_configure_aio: false
 # Defines if instances should be launched as part of the post install
 osa_launch_instances: false
 
+# Defines if ceph-ansible is to be installed
+osa_install_ceph: false
+
 # Defines images to create in glance
 osa_images: []
 #  - name: xenial-image

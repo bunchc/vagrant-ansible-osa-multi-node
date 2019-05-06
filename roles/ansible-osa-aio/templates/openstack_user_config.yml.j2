@@ -118,13 +118,20 @@ network_hosts:
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
 {% endfor %}
 #
+# Compute hosts
+#
+{% if groups['compute'] %}
 compute_hosts:
 {% for compute_host in groups['compute'] %}
   {{ hostvars[compute_host]['ansible_hostname'] }}:
     ip: {{ hostvars[compute_host]['br_mgmt_ip'] }}
     ansible_user: {{ hostvars[compute_host]['ansible_user'] }}
 {% endfor %}
+{% endif %}
 #
+# Ceph Hosts
+#
+{% if groups['ceph'] is defined %}
 ceph-osd_hosts:
 {% for ceph_osd in groups['ceph'] %}
   {{ hostvars[ceph_osd]['ansible_hostname'] }}:
@@ -138,6 +145,9 @@ ceph-mon_hosts:
     ip: {{ hostvars[controller]['br_mgmt_ip'] }}
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
 {% endfor %}
+{% endif %}
+#
+# Log hosts
 #
 log_hosts:
 {% for controller in groups['openstack'] %}
@@ -146,6 +156,9 @@ log_hosts:
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
 {% endfor %}
 #
+# Storage hosts, if Ceph hosts are available
+#
+{% if groups['ceph'] is defined %}
 storage-infra_hosts:
 {% for controller in groups['openstack'] %}
   {{ hostvars[controller]['ansible_hostname'] }}:
@@ -159,3 +172,4 @@ storage_hosts:
     ip: {{ hostvars[controller]['br_mgmt_ip'] }}
     ansible_user: {{ hostvars[controller]['ansible_user'] }}
 {% endfor %}
+{% endif %}

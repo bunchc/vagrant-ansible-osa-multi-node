@@ -4,6 +4,9 @@ network:
   ethernets:
     ens5:
       dhcp4: yes
+    ens6:
+      dhcp4: no
+      addresses: [ {{ ansible_ssh_host }}/22 ]
     {{ br_mgmt_interface }}:
       dhcp4: no
 {% if br_vlan_interface is defined and br_vlan_interface != None %}

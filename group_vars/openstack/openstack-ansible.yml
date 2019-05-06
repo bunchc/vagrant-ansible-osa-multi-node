@@ -21,6 +21,9 @@ monitorstack_openstack_services:
 # Build an AIO
 run_aio: false
 
+# Defines if ceph-ansible isto be used
+osa_install_ceph: false
+
 # Set up monitorstack checks
 #telegraf_inputs:
 #  # Defines scripts to execute

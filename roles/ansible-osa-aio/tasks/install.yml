@@ -49,7 +49,22 @@
           run_aio is defined and
           not run_aio
 
-- name: install | Add values to user_config.yml
+- name: install | Generate fsid for Ceph
+  set_fact:
+    fsid: "{{ inventory_hostname | to_uuid }}"
+  when: >
+          osa_install_ceph is defined and
+          osa_install_ceph
+
+- name: install | Store fsid on new host
+  add_host:
+    name: FSID_HOST
+    ceph_fsid: "{{ fsid }}"
+  when: >
+          fsid is defined and
+          fsid != None
+
+- name: install | Add values to user_variables.yml
   blockinfile:
     block: "{{ lookup('template', 'templates/user_variables.yml.j2') }}"
     dest: /etc/openstack_deploy/user_variables.yml
@@ -105,14 +120,6 @@
   delay: 10
   register: setup_openstack
   until: setup_openstack.rc == 0
-- name: install | Running setup-hosts.yml
-  shell: openstack-ansible setup-hosts.yml
-  args:
-    chdir: "{{ osa_download_location }}/playbooks"
-  retries: 3
-  delay: 10
-  register: setup_hosts
-  until: setup_hosts.rc == 0
 
 - name: install | Set Insecure in clouds.yml
   lineinfile:

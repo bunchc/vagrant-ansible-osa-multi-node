@@ -38,13 +38,13 @@
       when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('172.29.236.0/22')"
       with_items:
         - "{{ ansible_interfaces }}"
-    - name: "[br-vlan] Set network facts"
+    - name: "[br-flat] Set network facts"
       set_fact:
         br_flat_interface: "{{ item }}"
       when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('192.168.100.0/22')"
       with_items:
         - "{{ ansible_interfaces }}"
-    - name: "[br-flat] Set network facts"
+    - name: "[br-vlan] Set network facts"
       set_fact:
         br_vlan_interface: "{{ item }}"
       when: "hostvars[inventory_hostname]['ansible_{{item}}']['ipv4']['address'] | ipaddr('10.10.0.0/22')"

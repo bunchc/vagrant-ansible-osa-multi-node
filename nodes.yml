@@ -82,73 +82,73 @@
 # `osa_enable_ceph: true` in group_vars/openstack/openstack.yml
 #
 # To add additional nodes, copy the below lines
-
-- name: osa-ceph-01
-  ansible_groups:
-    - elkstack
-    - ceph
-  box: bunchc/bionic64
-  desktop: false
-  provider: libvirt
-  interfaces:
-    - ip: 192.168.200.81
-      auto_config: true
-      method: static
-    - ip: 172.29.236.81
-      auto_config: true
-      method: static
-    - ip: 172.29.244.81
-      auto_config: true
-      method: static
-  mem: 4096
-  provision: true
-  vcpu: 1
-  windows: false
-
-- name: osa-ceph-02
-  ansible_groups:
-    - elkstack
-    - ceph
-  box: bunchc/bionic64
-  desktop: false
-  provider: libvirt
-  interfaces:
-    - ip: 192.168.200.82
-      auto_config: true
-      method: static
-    - ip: 172.29.236.82
-      auto_config: true
-      method: static
-    - ip: 172.29.244.82
-      auto_config: true
-      method: static
-  mem: 4096
-  provision: true
-  vcpu: 1
-  windows: false
-
-- name: osa-ceph-03
-  ansible_groups:
-    - elkstack
-    - ceph
-  box: bunchc/bionic64
-  desktop: false
-  provider: libvirt
-  interfaces:
-    - ip: 192.168.200.83
-      auto_config: true
-      method: static
-    - ip: 172.29.236.83
-      auto_config: true
-      method: static
-    - ip: 172.29.244.83
-      auto_config: true
-      method: static
-  mem: 4096
-  provision: true
-  vcpu: 1
-  windows: false
-
+#
+#- name: osa-ceph-01
+#  ansible_groups:
+#    - elkstack
+#    - ceph
+#  box: bunchc/bionic64
+#  desktop: false
+#  provider: libvirt
+#  interfaces:
+#    - ip: 192.168.200.81
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.236.81
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.244.81
+#      auto_config: true
+#      method: static
+#  mem: 4096
+#  provision: true
+#  vcpu: 1
+#  windows: false
+#
+#- name: osa-ceph-02
+#  ansible_groups:
+#    - elkstack
+#    - ceph
+#  box: bunchc/bionic64
+#  desktop: false
+#  provider: libvirt
+#  interfaces:
+#    - ip: 192.168.200.82
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.236.82
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.244.82
+#      auto_config: true
+#      method: static
+#  mem: 4096
+#  provision: true
+#  vcpu: 1
+#  windows: false
+#
+#- name: osa-ceph-03
+#  ansible_groups:
+#    - elkstack
+#    - ceph
+#  box: bunchc/bionic64
+#  desktop: false
+#  provider: libvirt
+#  interfaces:
+#    - ip: 192.168.200.83
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.236.83
+#      auto_config: true
+#      method: static
+#    - ip: 172.29.244.83
+#      auto_config: true
+#      method: static
+#  mem: 4096
+#  provision: true
+#  vcpu: 1
+#  windows: false
+#
 # OpenStack Ansible controller
 # After the other nodes have come online, this builds the control plane
 # Copy this config to add additional controller nodes

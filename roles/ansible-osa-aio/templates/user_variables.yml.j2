@@ -10,8 +10,17 @@ neutron_metadata_checksum_fix: True
 neutron_l2_population: true
 
 #
+# set nova_virt_type to qemu for nested virt
+#
+nova_virt_type: qemu
+
+#
 # ceph-ansible settings
 #
+
+generate_fsid: false
+{% if osa_install_ceph is defined and osa_install_ceph %}
+fsid: {{ hostvars['FSID_HOST']['ceph_fsid'] }}
 
 monitor_address_block: "172.29.236.0/22"
 pubic_network: "172.29.236.0/22"
@@ -35,3 +44,4 @@ cinder_backends:
     rbd_user: "{{ '{{' }} cinder_ceph_client {{ '}}' }}"
     rbd_secret_uuid: "{{ '{{' }} cinder_ceph_client_uuid {{ '}}' }}"
     report_discard_supported: true
+{% endif %}
