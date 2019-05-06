@@ -1,21 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-- [Purpose](#purpose)
-- [Requirements](#requirements)
-  - [Software](#software)
-- [Environment](#environment)
-  - [Example Ansible inventory which is generated when Spinning Up](#example-ansible-inventory-which-is-generated-when-spinning-up)
-- [Quick How-To](#quick-how-to)
-  - [Spinning Up](#spinning-up)
-  - [Kibana](#kibana)
-  - [Grafana](#grafana)
-  - [Tearing Down](#tearing-down)
-- [Testing](#testing)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 ## Purpose
 
 To spin up a multi node openstack-ansible lab.
