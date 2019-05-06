@@ -1,44 +1,14 @@
 ---
-# This defines the openstack-ansible release to use.
-# The following values are known to work:
-# stable/newton
-# stable/ocata
-# stable/pike
-#release: "stable/newton"
-
-## Monitorstack config
-monitorstack_config: true
-monitorstack_openstack_services:
-  - name: DEFAULT
-    insecure: true
-    monitorstack_auth_url: "http://{{ ansible_ssh_host }}:5000/v3/"
-    monitorstack_monitorstack_user: admin
-    monitorstack_password: admin
-    monitorstack_user_domain_name: default
-    monitorstack_project_domain_name: default
-    monitorstack_project_name: admin
-
-# Build an AIO
-run_aio: false
-
-# Defines if ceph-ansible isto be used
-osa_install_ceph: false
-
-# Set up monitorstack checks
-#telegraf_inputs:
-#  # Defines scripts to execute
-#  exec:
-#    commands:
-#      - /usr/local/bin/monitorstack -f telegraf kvm
-#    data_format: influx
-#    enabled: false
-#    timeout: 5s
-
-
 # Defines the release, tag, branch, or commit of openstack-ansible to deploy
 # Role has been tested with:
 # stable/queens stable/rocky stable/stein
-osa_release: "stable/rocky"
+#osa_release: "stable/rocky"
+
+# Build an AIO
+#run_aio: false
+
+# Defines if ceph-ansible isto be used
+#osa_install_ceph: false
 
 # Defines the location to clone openstack-ansible to
 osa_download_location: /opt/openstack-ansible

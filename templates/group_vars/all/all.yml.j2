@@ -1,0 +1,19 @@
+---
+# Defines the release, tag, branch, or commit of openstack-ansible to deploy
+# Role has been tested with:
+# stable/rocky stable/stein
+osa_release: {{ osa_release | default('"stable/rocky') }}
+
+# Defines if we are building an aio
+run_aio: {{ osa_aio | default('false') }}
+
+# Defines if ceph-ansible is to be used
+osa_install_ceph: {{ osa_ceph | default('false') }}
+
+reboot_timeout: "300"
+
+pri_domain_name: {{ osa_domain }}
+
+timezone: UTC
+
+vip: {{ osa_vip }}

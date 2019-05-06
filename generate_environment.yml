@@ -3,53 +3,49 @@
   gather_facts: false
   become: false
   vars:
-    # Defines the number of brokers to spin up
-    elk_brokers:
-      count: 3
-      cpu: 1
-      memory: 512
-    # Defines the number of dashboards to spin up
-    elk_dashboards:
-      count: 1
-      cpu: 1
-      memory: 1024
-    # Defines the dns domain name for environment
-    elk_domain: test.vagrant.local
-    # Defines the number of Elasticsearch nodes to spin up
-    elk_elasticsearch:
-      count: 3
-      cpu: 1
-      memory: 1024
-    # Defines the netmask cidr for environment
-    elk_ip_netmask: 24
-    # Defines the subnet for environment
-    elk_ip_subnet: 192.168.250.0
-    # Defines the number of loadbalancers to spin up
-    elk_loadbalancers:
-      count: 2
-      cpu: 1
-      memory: 512
-    # Defines the number of processors to spin up
-    elk_preprocessors:
-      count: 1
-      cpu: 1
-      memory: 1024
-    # Defines the primary interface of VMs to use
-    elk_pri_interface: enp0s8
-    # Defines the number of processors to spin up
-    elk_processors:
-      count: 1
-      cpu: 1
-      memory: 1024
-    # Defines the numer of openstack-ansible all-in-ones to spin up
-    openstack_aio:
+    # Defines the openstack-ansible release to use
+    osa_release: "stable/rocky"
+    # Defines if environment should be provisioned as an openstack-ansible all-in-one
+    osa_aio: false
+    # Defines if Ceph is to be used
+    osa_ceph: false
+    # Defines the number of controllers to spin up
+    osa_controllers:
       count: 1
       cpu: 4
-      memory: 24576
+      memory: 16384
+    # Defines the number of compute nodes to spin up
+    osa_compute:
+      count: 2
+      cpu: 4
+      memory: 8192
+    # Defines the number of Ceph nodes to spin up
+    osa_ceph:
+      count: 3
+      cpu: 1
+      memory: 4096
+    # Defines the numer of openstack-ansible all-in-ones to spin up
+    osa_aio:
+      count: 0
+      cpu: 4
+      memory: 16384
+    # Defines the dns domain name for environment
+    osa_domain: test.vagrant.local
+    # Defines the netmask cidr for environment
+    osa_ip_netmask: 22
+    # Defines the subnets for environment
+    osa_ip_subnet: 192.168.200.0
+    osa_mgmt_subnet: 172.29.236.0
+    osa_flat_subnet: 192.168.100.0
+    osa_vlan_subnet: 10.10.0.0
+    osa_vxlan_subnet: 172.26.240.0
+    osa_storage_subnet: 172.29.244.0
+    # Defines the primary interface of VMs to use
+    osa_pri_interface: enp0s8
     # Defines the VIP of environment
-    elk_vip: 192.168.250.100
+    osa_vip: 192.168.200.100
     # Defines the Vagrant box image to use
-    vagrant_image: bunchc/ubuntu-16.04-libvirt
+    vagrant_image: bunchc/bionic64
     # Defines the provider to use
     vagrant_provider: libvirt
   tasks:
@@ -59,23 +55,9 @@
         src: templates/nodes.yml.j2
         dest: ./nodes.yml
 
-    # Ensures vip: is defined properly based on elk_vip
-    - name: Ensuring elk_vip Is Defined Properly in group_vars/all/all.yml
-      lineinfile:
-        path: group_vars/all/all.yml
-        regexp: "^vip:"
-        line: "vip: {{ elk_vip }}"
-
-    # Ensures pri_domain_name is defined properly based on elk_domain
-    - name: Ensuring elk_domain Is Defined Properly in group_vars/all/all.yml
-      lineinfile:
-        path: group_vars/all/all.yml
-        regexp: "^pri_domain_name:"
-        line: "pri_domain_name: {{ elk_domain }}"
-
-    # Ensures pri_interface is defined properly based on elk_pri_interface
-    - name: Ensuring elk_pri_interface Is Defined Properly in group_vars/all/all.yml
-      lineinfile:
-        path: group_vars/all/all.yml
-        regexp: "^pri_interface:"
-        line: "pri_interface: {{ elk_pri_interface }}"
+    # Generates an updated group_vars/all/all.yml
+    - name: Generating group_vars/all/all.yml
+      template:
+        src: templates/group_vars/all/all.yml.j2
+        dest: ./group_vars/all/all.yml
+        backup: true

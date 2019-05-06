@@ -1,241 +1,143 @@
 ---
-{% set _ip_subnet = elk_ip_subnet|ipsubnet(elk_ip_netmask) %}
+{% set _ip_subnet = osa_ip_subnet|ipsubnet(osa_ip_netmask) %}
+{% set _mgmt_subnet = osa_mgmt_subnet|ipsubnet(osa_ip_netmask) %}
+{% set _flat_subnet = osa_flat_subnet|ipsubnet(osa_ip_netmask) %}
+{% set _vlan_subnet = osa_vlan_subnet|ipsubnet(osa_ip_netmask) %}
+{% set _vxlan_subnet = osa_vxlan_subnet|ipsubnet(osa_ip_netmask) %}
+{% set _storage_subnet = osa_storage_subnet|ipsubnet(osa_ip_netmask) %}
 {% set _ip_subnet_size = _ip_subnet|ipaddr('size') %}
-{% for lb in range(elk_loadbalancers['count']) %}
+###########################
+# OpenStack compute nodes #
+###########################
+#
+# This section defines compute hosts for openstack.
+# To add more compute hosts duplicate a host definition and change as needed.
+#
+# Currently this supports two cells: cell1 and cell2
+# By default, all hosts are configured for cell 1.
+{% for compute in range(osa_compute['count']) %}
 {%   set _starting_ip = loop.index + 10 %}
 {%   set _ip_addr = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _mgmt_addr = _mgmt_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _flat_addr = _flat_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _vlan_addr = _vlan_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _vxlan_addr = _vxlan_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _storage_addr = _storage_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
 {%   set _gateway = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('1')|ipaddr('address') %}
-- name: lb-0{{ loop.index }}
+
+- name: osa-comp-0{{ loop.index }}
   ansible_groups:
     - elkstack
-    - loadbalancers
+    - compute
+    - cell1
   box: {{ vagrant_image }}
   desktop: false
   provider: {{ vagrant_provider }}
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
   interfaces:
     - ip: {{ _ip_addr }}
       auto_config: true
       method: static
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: static
-  #     network_name: network-1
-  mem: {{ elk_loadbalancers['memory'] }}
+    - ip: {{ _mgmt_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _flat_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _vlan_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _vxlan_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _storage_addr }}
+      auto_config: true
+      method: static
+  mem: {{ osa_compute['memory'] }}
   provision: true
-  vcpu: {{ elk_loadbalancers['cpu'] }}
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
+  vcpu: {{ osa_compute['cpu'] }}
   windows: false
 {% endfor %}
-{% for broker in range(elk_brokers['count']) %}
+
+##################
+## Ceph Cluster ##
+##################
+#
+# Builds a ceph cluster for use with cinder.
+# To provision the ceph cluster set:
+# `osa_enable_ceph: true` in group_vars/openstack/openstack.yml
+{% for ceph in range(osa_ceph['count']) %}
 {%   set _starting_ip = loop.index + 20 %}
 {%   set _ip_addr = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _mgmt_addr = _mgmt_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _storage_addr = _storage_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
 {%   set _gateway = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('1')|ipaddr('address') %}
-- name: broker-0{{ loop.index }}
+
+- name: osa-ceph-0{{ loop.index }}
   ansible_groups:
-    - brokers
     - elkstack
+    - ceph
   box: {{ vagrant_image }}
   desktop: false
   provider: {{ vagrant_provider }}
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
   interfaces:
     - ip: {{ _ip_addr }}
       auto_config: true
       method: static
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: static
-  #     network_name: network-1
-  mem: {{ elk_brokers['memory'] }}
+    - ip: {{ _mgmt_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _storage_addr }}
+      auto_config: true
+      method: static
+  mem: {{ osa_ceph['memory'] }}
   provision: true
-  vcpu: {{ elk_brokers['cpu'] }}
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
+  vcpu: {{ osa_ceph['cpu'] }}
   windows: false
 {% endfor %}
-{% for pre_processor in range(elk_preprocessors['count']) %}
+
+##############################
+# OpenStack controller nodes #
+##############################
+#
+# OpenStack controllers
+#
+# This section defines the nodes for the OpenStack control plane.
+{% for controller in range(osa_controllers['count']) %}
 {%   set _starting_ip = loop.index + 30 %}
-{%   set _ip_addr = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
-{%   set _gateway = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('1')|ipaddr('address') %}
-- name: pre-processor-0{{ loop.index }}
-  ansible_groups:
-    - elkstack
-    - pre_processors
-  box: {{ vagrant_image }}
-  desktop: false
-  provider: {{ vagrant_provider }}
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
-  interfaces:
-    - ip: {{ _ip_addr }}
-      auto_config: true
-      method: static
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: static
-  #     network_name: network-1
-  mem: {{ elk_preprocessors['memory'] }}
-  provision: true
-  vcpu: {{ elk_preprocessors['cpu'] }}
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
-  windows: false
-{% endfor %}
-{% for processor in range(elk_processors['count']) %}
-{%   set _starting_ip = loop.index + 40 %}
-{%   set _ip_addr = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
-{%   set _gateway = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('1')|ipaddr('address') %}
-- name: processor-0{{ loop.index }}
-  ansible_groups:
-    - elkstack
-    - processors
-  box: {{ vagrant_image }}
-  desktop: false
-  provider: {{ vagrant_provider }}
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
-  interfaces:
-    - ip: {{ _ip_addr }}
-      auto_config: true
-      method: static
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: static
-  #     network_name: network-1
-  mem: {{ elk_processors['memory'] }}
-  provision: true
-  vcpu: {{ elk_processors['cpu'] }}
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
-  windows: false
-{% endfor %}
-{% for es in range(elk_elasticsearch['count']) %}
-{%   set _starting_ip = loop.index + 50 %}
-{%   set _ip_addr = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
-{%   set _gateway = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('1')|ipaddr('address') %}
-- name: es-0{{ loop.index }}
-  ansible_groups:
-    - elasticsearch
-    - elkstack
-  box: {{ vagrant_image }}
-  desktop: false
-  provider: {{ vagrant_provider }}
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
-  interfaces:
-    - ip: {{ _ip_addr }}
-      auto_config: true
-      method: static
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: static
-  #     network_name: network-1
-  mem: {{ elk_elasticsearch['memory'] }}
-  provision: true
-  vcpu: {{ elk_elasticsearch['cpu'] }}
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
-  windows: false
-{% endfor %}
-{% for dashboard in range(elk_dashboards['count']) %}
-{%   set _starting_ip = loop.index + 60 %}
-{%   set _ip_addr = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
-{%   set _gateway = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('1')|ipaddr('address') %}
-- name: dashboard-0{{ loop.index }}
-  ansible_groups:
-    - dashboard
-    - elkstack
-  box: {{ vagrant_image }}
-  desktop: false
-  provider: {{ vagrant_provider }}
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
-  interfaces:
-    - ip: {{ _ip_addr }}
-      auto_config: true
-      method: static
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: static
-  #     network_name: network-1
-  mem: {{ elk_dashboards['memory'] }}
-  provision: true
-  vcpu: {{ elk_dashboards['cpu'] }}
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
-  windows: false
-{% endfor %}
-{% for openstackansible in range(openstack_aio['count']) %}
-{%   set _starting_ip = loop.index + 70 %}
-{%   set _ip_addr = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
-{%   set _gateway = _ip_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('1')|ipaddr('address') %}
-- name: openstack-ansible-0{{ loop.index }}
+{%   set _mgmt_addr = _mgmt_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _flat_addr = _flat_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _vlan_addr = _vlan_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _vxlan_addr = _vxlan_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+{%   set _storage_addr = _storage_subnet|ipaddr('net')|ipaddr(_starting_ip)|ipaddr('address') %}
+
+- name: osa-contoller-0{{ loop.index }}
   ansible_groups:
     - elkstack
     - openstack
   box: {{ vagrant_image }}
   desktop: false
   provider: {{ vagrant_provider }}
-  # disks:
-  #   - size: 10
-  #     controller: "SATA Controller"
-  #   - size: 10
-  #     controller: "SATA Controller"
   interfaces:
     - ip: {{ _ip_addr }}
       auto_config: true
       method: static
-  #   - ip: 192.168.1.10
-  #     auto_config: false
-  #     method: static
-  #     network_name: network-1
-  mem: {{ openstack_aio['memory'] }}
+    - ip: {{ _mgmt_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _flat_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _vlan_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _vxlan_addr }}
+      auto_config: true
+      method: static
+    - ip: {{ _storage_addr }}
+      auto_config: true
+      method: static
+  mem: {{ osa_controllers['memory'] }}
   provision: true
-  vcpu: {{ openstack_aio['cpu'] }}
-  # port_forwards:
-  #   - guest: 80
-  #     host: 8080
-  #   - guest: 443
-  #     host: 4433
+  vcpu: {{ osa_controllers['cpu'] }}
   windows: false
 {% endfor %}
