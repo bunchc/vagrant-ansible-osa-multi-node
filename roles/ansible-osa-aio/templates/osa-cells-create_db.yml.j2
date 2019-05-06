@@ -1,0 +1,26 @@
+---
+- name: Create DB for cell
+  mysql_db:
+    login_user: "{{ '{{' }} galera_root_user {{ '}}' }}"
+    login_password: "{{ '{{' }} galera_root_password {{ '}}' }}"
+    login_host: "{{ '{{' }} nova_galera_address {{ '}}' }}"
+    name: "{{ item['name'] {{ '}}' }}"
+    state: "present"
+  delegate_to: "{{ '{{' }} nova_db_setup_host {{ '}}' }}"
+  no_log: True
+  with_items: "{{ osa_cells }}"
+
+- name: Grant access to DBs for the services
+  mysql_user:
+    login_user: "{{ '{{' }} galera_root_user {{ '}}' }}"
+    login_password: "{{ '{{' }} galera_root_password {{ '}}' }}"
+    login_host: "{{ '{{' }} nova_galera_address {{ '}}' }}"
+    name: "{{ '{{' }} item['name'] {{ '}}' }}"
+    password: "{{ '{{' }} item['password'] {{ '}}' }}"
+    host: "{{ '{{' }} item['host'] {{ '}}' }}"
+    state: "present"
+    priv: "{{ '{{' }} item['database'] {{ '}}' }}.*:ALL"
+    append_privs: "{{ '{{' }} item['db_append_privs'] | default(omit) {{ '}}' }}"
+  delegate_to: "{{ '{{' }} nova_db_setup_host {{ '}}' }}"
+  with_items: "{{ osa_cells }}"
+  no_log: True

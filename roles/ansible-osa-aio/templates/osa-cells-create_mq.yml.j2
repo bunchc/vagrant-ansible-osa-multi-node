@@ -1,0 +1,22 @@
+---
+- name: Setup RPC MQ Service (RabbitMQ)
+  delegate_to: "{{ '{{' }} _oslomsg_rpc_setup_host {{ '}}' }}"
+  block:
+    - name: Add RPC RabbitMQ vhost
+      rabbitmq_vhost:
+        name: "{{ '{{' }} item['name'] {{ '}}' }}"
+        state: "present"
+      with_items: "{{ osa_cells }}"
+
+    - name: Add RPC RabbitMQ user
+      rabbitmq_user:
+        user: "{{ '{{' }} item['name'] {{ '}}' }}"
+        password: "{{ '{{' }} item['password'] {{ '}}' }}"
+        vhost: "{{ '{{' }} item['name'] {{ '}}' }}"
+        configure_priv: ".*"
+        read_priv: ".*"
+        write_priv: ".*"
+        state: "present"
+        force: true
+      with_items: "{{ osa_cells }}"
+      no_log: true

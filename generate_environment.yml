@@ -9,6 +9,8 @@
     osa_aio: false
     # Defines if Ceph is to be used
     osa_ceph: false
+    # Defines if cells should be created
+    osa_cells: false
     # Defines the number of controllers to spin up
     osa_controllers:
       count: 1

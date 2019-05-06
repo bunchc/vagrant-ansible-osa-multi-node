@@ -7,6 +7,9 @@ osa_release: {{ osa_release | default('"stable/rocky') }}
 # Defines if we are building an aio
 run_aio: {{ osa_aio | default('false') }}
 
+# Defines if cells should be created
+osa_use_cells: {{ osa_cells }}
+
 # Defines if ceph-ansible is to be used
 osa_install_ceph: {{ osa_ceph | default('false') }}
 

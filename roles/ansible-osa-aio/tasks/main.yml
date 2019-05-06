@@ -4,6 +4,12 @@
 # Download and install an openstack-ansible aio
 - include: install.yml
 
+# Configure cells
+- include: osa_cells.yml
+  when: >
+          osa_use_cells is defined and
+          osa_use_cells
+
 # Download images and load them into glance
 - include: load_images.yml
   when: osa_configure_aio
