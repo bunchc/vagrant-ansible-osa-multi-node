@@ -1,14 +1,14 @@
 ---
 # Defines the release, tag, branch, or commit of openstack-ansible to deploy
 # Role has been tested with:
-# stable/queens stable/rocky stable/stein
-#osa_release: "stable/rocky"
+# stable/rocky stable/stein
+osa_release: "stable/rocky"
 
 # Build an AIO
-#run_aio: false
+run_aio: false
 
 # Defines if ceph-ansible isto be used
-#osa_install_ceph: false
+osa_install_ceph: false
 
 # Defines the location to clone openstack-ansible to
 osa_download_location: /opt/openstack-ansible

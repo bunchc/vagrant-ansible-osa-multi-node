@@ -1,22 +1,28 @@
 ---
-- name: Setup RPC MQ Service (RabbitMQ)
-  delegate_to: "{{ '{{' }} _oslomsg_rpc_setup_host {{ '}}' }}"
-  block:
-    - name: Add RPC RabbitMQ vhost
-      rabbitmq_vhost:
-        name: "{{ '{{' }} item['name'] {{ '}}' }}"
-        state: "present"
-      with_items: "{{ osa_cells }}"
+- name: Configure additional message queues for cells v2
+  hosts: "{{ '{{' }} rabbitmq_host_group | default('rabbitmq_all') {{ '}}' }}"
+  vars:
+    nova_oslomsg_rpc_setup_host: "{{ '{{' }} (nova_oslomsg_rpc_host_group in groups) | ternary(groups[nova_oslomsg_rpc_host_group][0], 'localhost') {{ '}}' }}"
+    _oslomsg_rpc_setup_host: "{{ '{{' }} nova_oslo_rpc_setup_host {{ '}}' }}"
+  tasks:
+    - name: Setup RPC MQ Service (RabbitMQ)
+      delegate_to: "{{ '{{' }} _oslomsg_rpc_setup_host {{ '}}' }}"
+      block:
+        - name: Add RPC RabbitMQ vhost
+          rabbitmq_vhost:
+            name: "{{ '{{' }} item['name'] {{ '}}' }}"
+            state: "present"
+          with_items: "{{ osa_cells }}"
 
-    - name: Add RPC RabbitMQ user
-      rabbitmq_user:
-        user: "{{ '{{' }} item['name'] {{ '}}' }}"
-        password: "{{ '{{' }} item['password'] {{ '}}' }}"
-        vhost: "{{ '{{' }} item['name'] {{ '}}' }}"
-        configure_priv: ".*"
-        read_priv: ".*"
-        write_priv: ".*"
-        state: "present"
-        force: true
-      with_items: "{{ osa_cells }}"
-      no_log: true
+        - name: Add RPC RabbitMQ user
+          rabbitmq_user:
+            user: "{{ '{{' }} item['name'] {{ '}}' }}"
+            password: "{{ '{{' }} item['password'] {{ '}}' }}"
+            vhost: "{{ '{{' }} item['name'] {{ '}}' }}"
+            configure_priv: ".*"
+            read_priv: ".*"
+            write_priv: ".*"
+            state: "present"
+            force: true
+          with_items: "{{ osa_cells }}"
+          no_log: true

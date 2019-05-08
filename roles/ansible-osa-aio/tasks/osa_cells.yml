@@ -1,37 +1,23 @@
 ---
 # Configures nova cells
+- name: cells | Copy cells playbooks into place
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ osa_download_location }}/playbooks/{{ item }}"
+  with_items:
+    - "osa-cells-create_db.yml"
+    - "osa-cells-create_mq.yml"
 
-- name: cells | Get list of additional cells
-  vars:
-    osa_cells:
-      - name: nova_cell2
-        password: "{{ nova_api_container_mysql_password }}"
-        host: "%"
-        database: "cell2"
-        db_append_privs: "yes"
-      - name: nova_cell2
-        password: "{{ nova_api_container_mysql_password }}"
-        host: "localhost"
-        database: "cell2"
-        db_append_privs: "yes"
-  tasks:
-    - name: cells | Copy cells playbooks into place
-      template:
-        src: "{{ item }}"
-        dest: "{{ osa_download_location }}/playbooks/{{ item }}"
-      with_items:
-        - "osa-cells-create_db.yml"
-        - "osa-cells-create_mq.yml"
+- name: cells | Create databases
+  shell: openstack-ansible osa-cells-create_db.yml
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+  register: cells_db
 
-    - name: cells | Create databases
-      shell: openstack-ansible osa-cells-create_db.yml
-      args:
-        chdir: "{{ osa_download_location }}/playbooks"
-      register: cells_db
-
-    - name: cells | Create message queues
-      shell: openstack-ansible osa-cells-create_mq.yml
-      chdir: "{{ osa_download_location }}/playbooks"
-      when: >
-              cells_db is defined and
-              cells_db.rc == 0
+- name: cells | Create message queues
+  shell: openstack-ansible osa-cells-create_mq.yml
+  args:
+    chdir: "{{ osa_download_location }}/playbooks"
+  when: >
+          cells_db is defined and
+          cells_db.rc == 0

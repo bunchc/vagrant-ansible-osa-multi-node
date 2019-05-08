@@ -3,8 +3,11 @@
 
 # Defines the release, tag, branch, or commit of openstack-ansible to deploy
 # Role has been tested with:
-# stable/newton stable/ocata stable/pike stable/queens
-osa_release: "stable/newton"
+# stable/rocky stable stein
+osa_release: "stable/stein"
+
+# Defines if an AIO is to be built
+run_aio: true
 
 # Defines the location to clone openstack-ansible to
 osa_download_location: /opt/openstack-ansible
@@ -17,6 +20,23 @@ osa_launch_instances: false
 
 # Defines if ceph-ansible is to be installed
 osa_install_ceph: false
+
+# Defines if additional nova cells should be created
+osa_use_cells: true
+
+# Defines a list of cells to create
+# name - both the name of the cell, rabbit vhost, and db
+osa_cells:
+  - name: nova_cell2
+    password: "{{ '{{' }} nova_api_container_mysql_password {{ '}}' }}"
+    host: "%"
+    database: "cell2"
+    db_append_privs: "yes"
+  - name: nova_cell4
+    password: "{{ '{{' }} nova_api_container_mysql_password {{ '}}' }}"
+    host: "localhost"
+    database: "cell4"
+    db_append_privs: "yes"
 
 # Defines images to create in glance
 osa_images: []
