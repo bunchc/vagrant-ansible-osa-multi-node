@@ -81,3 +81,4 @@ apt_cacher_server: "10.127.16.10"
 
 # Defines if apt-caching should be used for clients
 enable_apt_caching: true
+osa_use_cells: false

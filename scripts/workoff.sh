@@ -15,9 +15,9 @@ if [[ $active != 0 ]]; then
     exit $active
 else
     echo "Fixing the clock"
-    vagrant ssh osa-controller-01 -t -c "sudo chronyc -a makestep"
-    vagrant ssh osa-comp-c1-01 -t -c "sudo chronyc -a makestep"
-    vagrant ssh osa-comp-c2-01 -t -c "sudo chronyc -a makestep"
+    vagrant ssh osa-controller-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
+    vagrant ssh osa-comp-c1-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
+    vagrant ssh osa-comp-c2-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
 fi
 
 echo "Disabling sandbox"
@@ -28,9 +28,9 @@ if [[ $active != 0 ]]; then
     exit $active
 else
     echo "Fixing the clock"
-    vagrant ssh osa-controller-01 -t -c "sudo chronyc -a makestep"
-    vagrant ssh osa-comp-c1-01 -t -c "sudo chronyc -a makestep"
-    vagrant ssh osa-comp-c2-01 -t -c "sudo chronyc -a makestep"
+    vagrant ssh osa-controller-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
+    vagrant ssh osa-comp-c1-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
+    vagrant ssh osa-comp-c2-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
 fi
 
 echo "Setting tuned profile to server-powersave"

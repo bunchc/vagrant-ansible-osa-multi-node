@@ -17,6 +17,11 @@ if [[ $active != 0 ]]; then
     echo "Unable to enable sandbox mode"
     exit $active
 else
+    echo "Fixing clocks"
+    vagrant ssh osa-controller-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
+    vagrant ssh osa-comp-c1-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
+    vagrant ssh osa-comp-c2-01 -t -c "sudo chronyd -q 'server pool.ntp.org iburst'"
+
     echo "Connecing to controller"
     vagrant ssh osa-controller-01
 fi
